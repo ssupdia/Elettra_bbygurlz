@@ -7,7 +7,7 @@
 <title>Elettra 18.0 · Birthday</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Serif:ital@0;1&family=Pinyon+Script&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -60,6 +60,7 @@
 
 <!-- COPERTINA -->
 <header class="hero" id="top">
+  <svg class="lily-xl" aria-hidden="true"><use href="#lily"/></svg>
   <svg class="lily l-tr bloom" aria-hidden="true"><use href="#lily"/></svg>
   <svg class="lily l-bl spin" aria-hidden="true"><use href="#lily"/></svg>
   <div class="wrap hero-grid">
@@ -99,7 +100,7 @@
   <div class="wrap">
     <h2>Lei e le persone che ama</h2>
     <p class="lead">Perché nessuno è un prodotto singolo: Elettra funziona meglio in compagnia. Foto e video.</p>
-    <div class="gallery mosaic" data-folder="Persone" data-slots="12" data-fill="12" data-label="Foto o video"></div>
+    <div class="gallery mosaic" data-folder="Persone" data-slots="16" data-fill="16" data-label="Foto o video"></div>
   </div>
 </section>
 
@@ -136,10 +137,14 @@
     <p class="lead">Un moodboard in rosa, bordeaux e viola.</p>
     <div class="gallery mosaic" data-folder="Vibes" data-slots="12"></div>
     <h3 class="sub">Le sue fragranze preferite</h3>
-    <div class="scent">
+    <div class="scent-wrap">
+      <figure class="sticker s-left" data-avvolgi><img src="foto/Profumi/left.png" alt="" data-bucket="photos" data-percorso="Profumi/left.png" data-nascondi></figure>
+      <div class="scent">
       <article><h4>Dolce, ma non troppo</h4><p>Una nota golosa che non stucca mai.</p></article>
       <article><h4>Dark vibes</h4><p>Un fondo scuro, per chi sa che il bello sta anche nelle ombre.</p></article>
       <article><h4>Fruttato</h4><p>Ciliegie, frutti di bosco e un tocco di mela verde.</p></article>
+      </div>
+      <figure class="sticker s-right" data-avvolgi><img src="foto/Profumi/right.png" alt="" data-bucket="photos" data-percorso="Profumi/right.png" data-nascondi></figure>
     </div>
   </div>
 </section>
@@ -253,6 +258,10 @@
   <div class="wrap">
     <h2>Una lettera per te</h2>
     <p class="lead">Un messaggio che non è nelle note di rilascio.</p>
+    <div class="letter-grid">
+      <figure class="letter-photo" data-avvolgi>
+        <img src="foto/lettera.jpeg" alt="Elettra" data-bucket="photos" data-percorso="lettera.jpeg" data-nascondi>
+      </figure>
     <div class="envelope">
       <button class="btn magenta seal" id="openLetter" aria-expanded="false" aria-controls="paper">Apri la lettera</button>
       <article class="paper" id="paper" hidden>
@@ -261,6 +270,7 @@
         <p>Qui comparirà la tua lettera.</p>
         <p class="sign">Con affetto</p>
       </article>
+    </div>
     </div>
   </div>
 </section>
@@ -272,7 +282,10 @@
 <div class="player" id="player" role="dialog" aria-label="Lettore musicale">
   <button type="button" id="closePlayer" aria-label="Chiudi">×</button>
   <div class="pcard">
-    <div class="pcover" id="pCover"></div>
+    <div class="stage">
+      <div class="vinile" aria-hidden="true"><div class="disco"></div></div>
+      <div class="pcover" id="pCover"></div>
+    </div>
     <h3 id="pTitle"></h3>
     <p id="pArtist"></p>
     <audio id="pAudio" controls preload="none"></audio>
@@ -287,7 +300,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
-<script src="main.js"></script>
+<script src="config.js?v=6"></script>
+<script src="main.js?v=6"></script>
 </body>
 </html>

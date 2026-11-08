@@ -2,7 +2,12 @@
 // Le chiavi di Supabase stanno in config.js (così, quando sostituisci
 // main.js con una versione nuova, non perdi il collegamento).
 // ============================================================
-const CONFIG = window.ELETTRA_CONFIG || {};
+// config.js ha la precedenza; se la pagina fosse una copia vecchia che non lo carica,
+// si usano questi valori (la chiave publishable è fatta per essere pubblica).
+const CONFIG = window.ELETTRA_CONFIG || {
+  url: 'https://tnrpttyhlamcnwravmik.supabase.co',
+  key: 'sb_publishable_3iiRaVZvcvP83fqa28ZPUA_WV4nw1zE'
+};
 const SUPABASE_URL = CONFIG.url || '';
 const SUPABASE_ANON_KEY = CONFIG.key || '';
 
@@ -93,18 +98,33 @@ function creaFoto(src, alt) {
   return fig;
 }
 
-// Se le foto caricate non completano l'ultimo blocco, ripete le prime
-// così la griglia non ha mai buchi (mosaico: multipli di 6, altrimenti di 4).
+// Un mosaico non ha buchi se le tessere sono un multiplo di 6 oppure un multiplo di 6 più 4:
+// ogni blocco da 6 (una alta, una larga) riempie due righe, le ultime 4 tessere una riga intera.
+function numeroSenzaBuchi(n, mosaico) {
+  if (!mosaico) { while (n % 4 !== 0) n++; return n; }
+  while (n % 6 !== 0 && n % 6 !== 4) n++;
+  return n;
+}
+
+// Se le foto caricate sono meno del necessario (data-fill) o non completano l'ultimo blocco,
+// ripete le prime così la griglia non ha mai buchi.
 function riempiBuchi(g) {
-  const base = g.classList.contains('mosaic') ? 6 : 4;
-  const multiplo = parseInt(g.dataset.fill, 10) || base;
+  const minimo = parseInt(g.dataset.fill, 10) || 0;
   const tessere = Array.from(g.children);
-  if (!tessere.length || multiplo < 2) return;
-  let i = 0;
-  while (g.children.length % multiplo !== 0) {
-    g.appendChild(tessere[i % tessere.length].cloneNode(true));
-    i++;
-  }
+  if (!tessere.length || minimo === 1) return;
+  const totale = numeroSenzaBuchi(Math.max(tessere.length, minimo), g.classList.contains('mosaic'));
+  for (let i = 0; g.children.length < totale; i++) g.appendChild(tessere[i % tessere.length].cloneNode(true));
+  assegnaMosaico(g);
+}
+
+// Nel mosaico: la 1ª tessera di ogni blocco da 6 è alta, la 4ª è larga.
+function assegnaMosaico(g) {
+  if (!g.classList.contains('mosaic')) return;
+  const blocchi = Math.floor(g.children.length / 6) * 6;
+  Array.from(g.children).forEach(function (t, i) {
+    t.classList.toggle('alta', i < blocchi && i % 6 === 0);
+    t.classList.toggle('larga', i < blocchi && i % 6 === 3);
+  });
 }
 
 function riempiSegnaposto(g) {
@@ -118,6 +138,7 @@ function riempiSegnaposto(g) {
     fig.querySelector('img').onerror = function () { this.remove(); };
     g.appendChild(fig);
   }
+  assegnaMosaico(g);
 }
 
 async function caricaDaSupabase(g) {
@@ -141,6 +162,9 @@ async function caricaDaSupabase(g) {
       const url = db.storage.from('photos').getPublicUrl(cartella + '/' + f.name).data.publicUrl;
       const fig = creaFoto(url, didascalie[f.name] || ('Elettra, ' + cartella + ' ' + (i + 1)));
       fig.dataset.path = cartella + '/' + f.name; // per la modalità ?debug
+      const media = fig.querySelector('img, video');
+      media.dataset.bucket = 'photos';
+      media.dataset.percorso = cartella + '/' + f.name;
       if (didascalie[f.name]) {
         const c = document.createElement('figcaption');
         c.textContent = didascalie[f.name];
@@ -229,6 +253,13 @@ async function applicaSfondo(el) {
       return;
     } catch (e) { /* prossimo candidato */ }
   }
+  if (db) { // ultima possibilità: link temporaneo (serve se il bucket non è pubblico)
+    for (const ext of ESTENSIONI) {
+      const u = await urlFirmato('photos', file + '.' + ext);
+      if (!u) continue;
+      try { await provaImmagine(u); el.style.backgroundImage = VELO + ', url("' + u + '")'; return; } catch (e) { /* niente */ }
+    }
+  }
 }
 document.querySelectorAll('[data-bgfolder]').forEach(applicaSfondo);
 
@@ -243,8 +274,15 @@ const pAudio = document.getElementById('pAudio');
 const pMsg = document.getElementById('pMsg');
 const SFONDO_COPERTINA = 'linear-gradient(160deg, #f19ac0, #7a3fa8)';
 
-function apriPlayer(b) {
-  pCover.style.backgroundImage = b.cover ? 'url("' + b.cover + '"), ' + SFONDO_COPERTINA : SFONDO_COPERTINA;
+let correnteB = null;
+let audioRiprovato = false;
+
+function apriPlayer(b, coverUrl) {
+  correnteB = b;
+  audioRiprovato = false;
+  player.classList.remove('in-pausa');
+  const cover = coverUrl || b.cover;
+  pCover.style.backgroundImage = cover ? 'url("' + cover + '"), ' + SFONDO_COPERTINA : SFONDO_COPERTINA;
   pTitle.textContent = b.title || '';
   pArtist.textContent = b.artist || '';
   pMsg.hidden = true;
@@ -266,8 +304,14 @@ function chiudiPlayer() {
   pAudio.load();
   player.classList.remove('on');
 }
-pAudio.addEventListener('error', function () {
+pAudio.addEventListener('error', async function () {
   if (!pAudio.getAttribute('src')) return;
+  // prima prova con un link temporaneo (serve se il bucket non è pubblico)
+  if (!audioRiprovato && correnteB && correnteB.audioPath) {
+    audioRiprovato = true;
+    const u = await urlFirmato('audio', correnteB.audioPath);
+    if (u) { pAudio.src = u; pAudio.play().catch(function () {}); return; }
+  }
   pMsg.textContent = 'Non riesco a caricare questo brano.';
   pMsg.hidden = false;
 });
@@ -289,7 +333,14 @@ function creaCopertina(b, i) {
     img.src = b.cover;
     img.alt = '';
     img.loading = 'lazy';
-    img.onerror = function () { this.remove(); };
+    img.onerror = async function () {
+      if (!this.dataset.firmato && b.coverPath) {
+        this.dataset.firmato = '1';
+        const u = await urlFirmato('photos', b.coverPath);
+        if (u) { this.src = u; return; }
+      }
+      this.remove();
+    };
     tile.appendChild(img);
   }
   if (b.title || b.artist) {
@@ -301,7 +352,10 @@ function creaCopertina(b, i) {
     if (b.title && b.artist) cap.appendChild(document.createTextNode(b.artist));
     tile.appendChild(cap);
   }
-  tile.addEventListener('click', function () { apriPlayer(b); });
+  tile.addEventListener('click', function () {
+    const im = tile.querySelector('img');
+    apriPlayer(b, im ? im.src : b.cover);
+  });
   return tile;
 }
 
@@ -318,7 +372,9 @@ async function caricaMusica() {
             artist: r.artist,
             title: r.title,
             cover: r.cover ? db.storage.from('photos').getPublicUrl('Musica/' + r.cover).data.publicUrl : null,
-            audio: r.audio ? db.storage.from('audio').getPublicUrl(r.audio).data.publicUrl : null
+            coverPath: r.cover ? 'Musica/' + r.cover : null,
+            audio: r.audio ? db.storage.from('audio').getPublicUrl(r.audio).data.publicUrl : null,
+            audioPath: r.audio || null
           };
         });
       }
@@ -436,7 +492,9 @@ async function braniDalleCartelle() {
           artist: '',
           title: '',
           cover: db.storage.from('photos').getPublicUrl('Musica/' + f.name).data.publicUrl,
-          audio: a ? db.storage.from('audio').getPublicUrl(a).data.publicUrl : null
+          coverPath: 'Musica/' + f.name,
+          audio: a ? db.storage.from('audio').getPublicUrl(a).data.publicUrl : null,
+          audioPath: a || null
         };
       });
   } catch (err) {
@@ -456,6 +514,10 @@ async function applicaSfondoFile(el, cartella, nomeFile) {
       el.style.backgroundImage = VELO + ', url("' + url + '")';
       return;
     } catch (e) { /* prossimo candidato */ }
+  }
+  if (db) {
+    const u = await urlFirmato('photos', cartella + '/' + nomeFile);
+    if (u) { try { await provaImmagine(u); el.style.backgroundImage = VELO + ', url("' + u + '")'; } catch (e) { /* niente */ } }
   }
 }
 
@@ -510,10 +572,14 @@ async function caricaCopertina() {
   const label = document.createElement('span');
   label.textContent = 'Foto';
   fig.prepend(label);
-  fig.querySelector('img').onerror = function () {
-    if (this.dataset.locale) { this.remove(); return; }
-    this.dataset.locale = '1';
-    this.src = 'foto/' + file; // seconda possibilità: file locale
+  fig.querySelector('img').onerror = async function () {
+    if (!this.dataset.passo) { // 1) link temporaneo (serve se il bucket non è pubblico)
+      this.dataset.passo = '1';
+      const u = db ? await urlFirmato('photos', file) : null;
+      if (u) { this.src = u; return; }
+    }
+    if (this.dataset.passo === '1') { this.dataset.passo = '2'; this.src = 'foto/' + file; return; } // 2) file locale
+    this.remove();
   };
   g.appendChild(fig);
 }
@@ -544,6 +610,13 @@ async function pannelloControllo() {
     const copertina = (document.querySelector('.gallery[data-file]') || {dataset: {}}).dataset.file;
     if (radice.error) scrivi('✘ bucket photos: ' + radice.error.message);
     else scrivi((radice.data.some(function (f) { return f.name === copertina; }) ? '✔ ' : '✘ ') + 'copertina ' + copertina + ' fuori dalle cartelle');
+    const prova = await db.storage.from('photos').list('Cibi', { limit: 10 });
+    const primo = (prova.data || []).find(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name); });
+    if (primo) {
+      const u = db.storage.from('photos').getPublicUrl('Cibi/' + primo.name).data.publicUrl;
+      try { await provaImmagine(u); scrivi('✔ bucket photos pubblico: i link diretti funzionano'); }
+      catch (e) { scrivi('✘ bucket photos NON pubblico: il sito usa un link temporaneo di riserva'); }
+    }
     const cartelle = ['Persone', 'Cibi', 'Silly', 'Vibes', 'Musica', 'Luoghi', 'Mondo', 'Passatempi'];
     for (const c of cartelle) {
       const r = await db.storage.from('photos').list(c, { limit: 100 });
@@ -561,3 +634,58 @@ async function pannelloControllo() {
     scrivi('✘ errore: ' + err.message);
   }
 }
+
+// ---------- Link temporanei di riserva ----------
+// Se un file non si apre con il link pubblico (bucket impostato come privato),
+// il sito chiede a Supabase un link temporaneo valido 24 ore e riprova.
+async function urlFirmato(bucket, percorso) {
+  if (!db) return null;
+  try {
+    const { data, error } = await db.storage.from(bucket).createSignedUrl(percorso, 86400);
+    return error || !data ? null : data.signedUrl;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Riprova un'immagine/video con il link temporaneo; se fallisce ancora, nasconde
+// l'elemento (o il suo contenitore data-avvolgi) quando è marcato con data-nascondi.
+async function ripara(el) {
+  if (!el || !el.dataset || !el.dataset.percorso) return;
+  if (el.dataset.riprovato) { nascondiSeSegnato(el); return; }
+  el.dataset.riprovato = '1';
+  const url = await urlFirmato(el.dataset.bucket || 'photos', el.dataset.percorso);
+  if (!url) { nascondiSeSegnato(el); return; }
+  if (el.tagName === 'VIDEO') { el.dataset.src = url; el.src = url + '#t=0.1'; }
+  else { el.src = url; }
+}
+function nascondiSeSegnato(el) {
+  if (el.dataset.nascondi === undefined) return;
+  (el.closest('[data-avvolgi]') || el).hidden = true;
+}
+
+// Gli errori di caricamento non "salgono": si ascoltano in fase di cattura.
+document.addEventListener('error', function (e) { ripara(e.target); }, true);
+// Immagini statiche (sticker, foto della lettera) già fallite prima che questo script partisse
+document.querySelectorAll('img[data-percorso]').forEach(function (img) {
+  if (img.complete && img.naturalWidth === 0) ripara(img);
+});
+
+// ---------- Player: il vinile si ferma quando la musica è in pausa ----------
+pAudio.addEventListener('play', function () { player.classList.remove('in-pausa'); });
+pAudio.addEventListener('pause', function () { player.classList.add('in-pausa'); });
+
+// ---------- Comparsa morbida delle sezioni allo scorrimento ----------
+(function () {
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.documentElement.classList.add('js');
+  const oss = new IntersectionObserver(function (voci) {
+    voci.forEach(function (v) {
+      if (v.isIntersecting) { v.target.classList.add('visibile'); oss.unobserve(v.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
+  document.querySelectorAll('section .wrap > *').forEach(function (el) {
+    el.classList.add('rivela');
+    oss.observe(el);
+  });
+})();
