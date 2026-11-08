@@ -227,3 +227,28 @@ section{position:relative;overflow:hidden}
 .dest{flex:0 1 calc((100% - 36px) / 3)}
 @media(max-width:900px){.dest{flex-basis:calc((100% - 18px) / 2)}}
 @media(max-width:560px){.dest{flex-basis:100%}}
+
+/* ===== calendario aesthetic ===== */
+.cal{position:relative;max-width:980px;margin:0 auto;background:#fdeff5;color:var(--plum);border-radius:8px;padding:clamp(16px,4vw,44px);box-shadow:0 30px 70px rgba(0,0,0,.4)}
+.cal::after{content:"";position:absolute;top:0;right:0;width:36%;height:46%;border-top-right-radius:8px;pointer-events:none;background-image:radial-gradient(circle,rgba(200,32,126,.4) 3px,transparent 3.5px);background-size:18px 18px;-webkit-mask-image:linear-gradient(to bottom left,#000,transparent 75%);mask-image:linear-gradient(to bottom left,#000,transparent 75%)}
+.cal-head,.cal-grid{position:relative;z-index:1}
+.cal-head{display:flex;justify-content:space-between;align-items:baseline;font-family:'Pinyon Script',cursive;font-size:clamp(2.4rem,8vw,4.4rem);line-height:1.1;color:var(--bordeaux);margin-bottom:16px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.dow{font-family:'Pinyon Script',cursive;font-size:clamp(1rem,2.8vw,1.9rem);text-align:center;padding-bottom:8px;color:var(--plum)}
+.dow .abbr{display:none}
+.cell{position:relative;min-height:clamp(56px,11vw,104px);padding:6px 8px;border-top:1.5px solid var(--plum);font-family:var(--serif);font-style:italic;font-size:clamp(.95rem,2.4vw,1.5rem);line-height:1.2}
+.dow:not(:nth-child(7n+1)),.cell:not(:nth-child(7n+1)){border-left:1.5px solid var(--plum)}
+.cell.off{color:#b996aa}
+.cell.big{z-index:3}
+.cell.big .num{color:var(--magenta);font-weight:600}
+.heart{position:absolute;left:50%;top:54%;width:215%;max-width:none;aspect-ratio:200/180;transform:translate(-50%,-50%);overflow:visible;pointer-events:none}
+.heart path{fill:none;stroke:var(--magenta);stroke-width:2.4;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 2.4s ease}
+.heart path+path{transition-delay:.5s}
+.cal.visible .heart path{stroke-dashoffset:0}
+.cell .label{position:absolute;left:50%;top:60%;width:175%;transform:translate(-50%,-50%) rotate(-8deg);font-family:'Pinyon Script',cursive;font-style:normal;font-size:clamp(.85rem,2.6vw,1.6rem);line-height:1.1;text-align:center;color:var(--plum);pointer-events:none}
+@media(max-width:700px){
+  .dow .full{display:none}
+  .dow .abbr{display:inline}
+  .cell{padding:4px 5px}
+}
+@media(prefers-reduced-motion:reduce){.heart path{stroke-dashoffset:0}}

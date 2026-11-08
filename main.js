@@ -325,3 +325,70 @@ async function caricaMusica() {
   brani.forEach(function (b, i) { griglia.appendChild(creaCopertina(b, i)); });
 }
 caricaMusica();
+
+// ---------- Calendario: novembre 2026, venerdì 13 cerchiato con un cuore ----------
+(function () {
+  const ANNO = 2026, MESE = 10, GIORNO = 13; // MESE: 0 = gennaio, 10 = novembre
+  const cal = document.getElementById('cal');
+  if (!cal) return;
+  const mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+  const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+  document.getElementById('calMese').textContent = mesi[MESE];
+  document.getElementById('calAnno').textContent = ANNO;
+  const griglia = document.getElementById('calGrid');
+
+  giorni.forEach(function (g) {
+    const d = document.createElement('div');
+    d.className = 'dow';
+    const full = document.createElement('span');
+    full.className = 'full';
+    full.textContent = g;
+    const abbr = document.createElement('span');
+    abbr.className = 'abbr';
+    abbr.textContent = g.slice(0, 3);
+    d.appendChild(full);
+    d.appendChild(abbr);
+    griglia.appendChild(d);
+  });
+
+  const primo = (new Date(ANNO, MESE, 1).getDay() + 6) % 7; // settimana da lunedì
+  const nelMese = new Date(ANNO, MESE + 1, 0).getDate();
+  const mesePrec = new Date(ANNO, MESE, 0).getDate();
+  const totale = Math.ceil((primo + nelMese) / 7) * 7;
+  const CUORE = '<svg class="heart" viewBox="0 0 200 180" aria-hidden="true">' +
+    '<path pathLength="1" d="M100 168C24 108 10 46 56 30c24-8 40 6 44 26 4-20 20-34 44-26 46 16 32 78-44 138z"/>' +
+    '<path pathLength="1" d="M104 172C20 106 4 40 54 24c26-9 42 8 46 30 5-22 22-38 48-28 48 17 30 84-44 146z"/></svg>';
+
+  for (let i = 0; i < totale; i++) {
+    const cella = document.createElement('div');
+    cella.className = 'cell';
+    let n;
+    if (i < primo) { n = mesePrec - primo + i + 1; cella.classList.add('off'); }
+    else if (i >= primo + nelMese) { n = i - primo - nelMese + 1; cella.classList.add('off'); }
+    else { n = i - primo + 1; }
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = n;
+    cella.appendChild(num);
+    if (!cella.classList.contains('off') && n === GIORNO) {
+      cella.classList.add('big');
+      cella.setAttribute('aria-label', giorni[i % 7] + ' ' + n + ' ' + mesi[MESE].toLowerCase() + ' ' + ANNO + ': compleanno di Elettra');
+      cella.insertAdjacentHTML('beforeend', CUORE); // stringa fissa, nessun dato esterno
+      const etichetta = document.createElement('span');
+      etichetta.className = 'label';
+      etichetta.textContent = 'Elettra’s birthday';
+      cella.appendChild(etichetta);
+    }
+    griglia.appendChild(cella);
+  }
+
+  // il cuore si disegna quando il calendario entra nello schermo
+  if ('IntersectionObserver' in window) {
+    const oss = new IntersectionObserver(function (voci) {
+      if (voci[0].isIntersecting) { cal.classList.add('visible'); oss.disconnect(); }
+    }, { threshold: 0.35 });
+    oss.observe(cal);
+  } else {
+    cal.classList.add('visible');
+  }
+})();
