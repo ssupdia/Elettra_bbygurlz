@@ -5,8 +5,8 @@
 // La chiave anon è fatta per stare nel browser: i permessi li
 // decidono le policy RLS (vedi supabase-setup.sql).
 // ============================================================
-const SUPABASE_URL = 'https://tnrpttyhlamcnwravmik.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_3iiRaVZvcvP83fqa28ZPUA_WV4nw1zE';
+const SUPABASE_URL = 'INCOLLA_QUI_IL_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'INCOLLA_QUI_LA_CHIAVE_ANON';
 
 const configurato = !SUPABASE_URL.startsWith('INCOLLA') && !SUPABASE_ANON_KEY.startsWith('INCOLLA');
 const db = configurato && window.supabase
@@ -37,13 +37,29 @@ btnLetter.addEventListener('click', function () {
 // ---------- Lightbox ----------
 const box = document.getElementById('lightbox');
 const boxImg = box.querySelector('img');
+const boxVideo = box.querySelector('video');
 document.addEventListener('click', function (e) {
-  if (!e.target.matches('.ph img')) return;
-  boxImg.src = e.target.src;
-  boxImg.alt = e.target.alt;
+  if (!e.target.matches('.ph:not(.track) img, .ph:not(.track) video')) return;
+  if (e.target.tagName === 'VIDEO') {
+    boxImg.hidden = true;
+    boxVideo.hidden = false;
+    boxVideo.src = e.target.dataset.src || e.target.currentSrc;
+    boxVideo.play().catch(function () { /* resta in pausa: basta premere Play */ });
+  } else {
+    boxVideo.hidden = true;
+    boxImg.hidden = false;
+    boxImg.src = e.target.src;
+    boxImg.alt = e.target.alt;
+  }
   box.classList.add('on');
 });
-function chiudiBox() { box.classList.remove('on'); boxImg.src = ''; }
+function chiudiBox() {
+  box.classList.remove('on');
+  boxImg.removeAttribute('src');
+  boxVideo.pause();
+  boxVideo.removeAttribute('src');
+  boxVideo.load();
+}
 document.getElementById('closeBox').addEventListener('click', chiudiBox);
 box.addEventListener('click', function (e) { if (e.target === box) chiudiBox(); });
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape') chiudiBox(); });
@@ -53,9 +69,23 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape') chiu
 //  1) le foto del bucket Supabase "photos", cartella "nome" (ordine alfabetico)
 //  2) altrimenti le foto locali foto/nome/1.jpg, 2.jpg ...
 //  3) altrimenti dei riquadri colorati segnaposto
+const RE_VIDEO = /\.(mp4|webm|mov|m4v)(\?|#|$)/i;
+
 function creaFoto(src, alt) {
   const fig = document.createElement('figure');
   fig.className = 'ph';
+  if (RE_VIDEO.test(src)) {
+    const v = document.createElement('video');
+    v.src = src + '#t=0.1'; // mostra un fotogramma come anteprima
+    v.dataset.src = src;
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = 'metadata';
+    v.setAttribute('aria-label', alt);
+    fig.classList.add('vid');
+    fig.appendChild(v);
+    return fig;
+  }
   const img = document.createElement('img');
   img.src = src;
   img.alt = alt;
@@ -64,13 +94,27 @@ function creaFoto(src, alt) {
   return fig;
 }
 
+// Se le foto caricate non completano l'ultimo blocco, ripete le prime
+// così la griglia non ha mai buchi (mosaico: multipli di 6, altrimenti di 4).
+function riempiBuchi(g) {
+  const base = g.classList.contains('mosaic') ? 6 : 4;
+  const multiplo = parseInt(g.dataset.fill, 10) || base;
+  const tessere = Array.from(g.children);
+  if (!tessere.length || multiplo < 2) return;
+  let i = 0;
+  while (g.children.length % multiplo !== 0) {
+    g.appendChild(tessere[i % tessere.length].cloneNode(true));
+    i++;
+  }
+}
+
 function riempiSegnaposto(g) {
   const cartella = g.dataset.folder;
   const n = parseInt(g.dataset.slots, 10) || 6;
   for (let i = 1; i <= n; i++) {
     const fig = creaFoto('foto/' + cartella + '/' + i + '.jpg', 'Foto ' + i);
     const label = document.createElement('span');
-    label.textContent = 'Foto ' + i;
+    label.textContent = (g.dataset.label || 'Foto') + ' ' + i;
     fig.prepend(label);
     fig.querySelector('img').onerror = function () { this.remove(); };
     g.appendChild(fig);
@@ -85,13 +129,14 @@ async function caricaDaSupabase(g) {
       limit: 60, sortBy: { column: 'name', order: 'asc' }
     });
     if (error || !data) return;
-    const file = data.filter(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name); });
+    const file = data.filter(function (f) { return /\.(jpe?g|png|webp|gif|mp4|webm|mov|m4v)$/i.test(f.name); });
     if (!file.length) return;
     g.textContent = '';
     file.forEach(function (f, i) {
       const url = db.storage.from('photos').getPublicUrl(cartella + '/' + f.name).data.publicUrl;
       g.appendChild(creaFoto(url, 'Elettra, ' + cartella + ' ' + (i + 1)));
     });
+    riempiBuchi(g);
   } catch (err) {
     console.error('Foto "' + cartella + '" non caricate da Supabase:', err);
   }
@@ -174,3 +219,109 @@ async function applicaSfondo(el) {
   }
 }
 document.querySelectorAll('[data-bgfolder]').forEach(applicaSfondo);
+
+// ---------- Musica ----------
+// Brani dalla tabella "music" di Supabase (copertina in photos/musica, audio nel bucket "audio").
+// Senza Supabase: foto/musica/1.jpg ... e audio/1.mp3 ... in locale.
+const player = document.getElementById('player');
+const pCover = document.getElementById('pCover');
+const pTitle = document.getElementById('pTitle');
+const pArtist = document.getElementById('pArtist');
+const pAudio = document.getElementById('pAudio');
+const pMsg = document.getElementById('pMsg');
+const SFONDO_COPERTINA = 'linear-gradient(160deg, #f19ac0, #7a3fa8)';
+
+function apriPlayer(b) {
+  pCover.style.backgroundImage = b.cover ? 'url("' + b.cover + '"), ' + SFONDO_COPERTINA : SFONDO_COPERTINA;
+  pTitle.textContent = b.title || '';
+  pArtist.textContent = b.artist || '';
+  pMsg.hidden = true;
+  if (b.audio) {
+    pAudio.hidden = false;
+    pAudio.src = b.audio;
+    pAudio.play().catch(function () { /* il browser può chiedere un tocco su Play */ });
+  } else {
+    pAudio.hidden = true;
+    pAudio.removeAttribute('src');
+    pMsg.textContent = 'Per questo brano non c’è ancora un file audio.';
+    pMsg.hidden = false;
+  }
+  player.classList.add('on');
+}
+function chiudiPlayer() {
+  pAudio.pause();
+  pAudio.removeAttribute('src');
+  pAudio.load();
+  player.classList.remove('on');
+}
+pAudio.addEventListener('error', function () {
+  if (!pAudio.getAttribute('src')) return;
+  pMsg.textContent = 'Non riesco a caricare questo brano.';
+  pMsg.hidden = false;
+});
+document.getElementById('closePlayer').addEventListener('click', chiudiPlayer);
+player.addEventListener('click', function (e) { if (e.target === player) chiudiPlayer(); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') chiudiPlayer(); });
+
+function creaCopertina(b, i) {
+  const tile = document.createElement('button');
+  tile.type = 'button';
+  tile.className = 'ph track';
+  tile.setAttribute('aria-label', 'Ascolta ' + (b.title || 'brano ' + (i + 1)));
+  const nota = document.createElement('span');
+  nota.className = 'note';
+  nota.textContent = '♪';
+  tile.appendChild(nota);
+  if (b.cover) {
+    const img = document.createElement('img');
+    img.src = b.cover;
+    img.alt = '';
+    img.loading = 'lazy';
+    img.onerror = function () { this.remove(); };
+    tile.appendChild(img);
+  }
+  if (b.title || b.artist) {
+    const cap = document.createElement('span');
+    cap.className = 'cap';
+    const t = document.createElement('b');
+    t.textContent = b.title || b.artist;
+    cap.appendChild(t);
+    if (b.title && b.artist) cap.appendChild(document.createTextNode(b.artist));
+    tile.appendChild(cap);
+  }
+  tile.addEventListener('click', function () { apriPlayer(b); });
+  return tile;
+}
+
+async function caricaMusica() {
+  const griglia = document.getElementById('musicGrid');
+  let brani = [];
+  if (db) {
+    try {
+      const { data, error } = await db.from('music')
+        .select('artist, title, cover, audio').order('position', { ascending: true });
+      if (!error && data) {
+        brani = data.map(function (r) {
+          return {
+            artist: r.artist,
+            title: r.title,
+            cover: r.cover ? db.storage.from('photos').getPublicUrl('musica/' + r.cover).data.publicUrl : null,
+            audio: r.audio ? db.storage.from('audio').getPublicUrl(r.audio).data.publicUrl : null
+          };
+        });
+      }
+    } catch (err) {
+      console.error('Musica non caricata da Supabase:', err);
+    }
+  }
+  if (!brani.length) {
+    const n = parseInt(griglia.dataset.slots, 10) || 8;
+    for (let i = 1; i <= n; i++) brani.push({ artist: '', title: '', cover: 'foto/musica/' + i + '.jpg', audio: 'audio/' + i + '.mp3' });
+  }
+  // completa l'ultima riga ripetendo i primi brani, così la griglia non ha buchi
+  const originali = brani.length;
+  for (let k = 0; brani.length % 4 !== 0; k++) brani.push(brani[k % originali]);
+  griglia.textContent = '';
+  brani.forEach(function (b, i) { griglia.appendChild(creaCopertina(b, i)); });
+}
+caricaMusica();

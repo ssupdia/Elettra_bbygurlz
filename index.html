@@ -74,7 +74,7 @@
         <a class="btn ghost" href="#lettera">Leggi la lettera</a>
       </div>
     </div>
-    <div class="cover"><div class="gallery" data-folder="cover" data-slots="1"></div></div>
+    <div class="cover"><div class="gallery" data-folder="cover" data-slots="1" data-fill="1"></div></div>
   </div>
 </header>
 
@@ -98,8 +98,8 @@
   <svg class="lily l-bl bloom" aria-hidden="true"><use href="#lily"/></svg>
   <div class="wrap">
     <h2>Lei e le persone che ama</h2>
-    <p class="lead">Perché nessuno è un prodotto singolo: Elettra funziona meglio in compagnia.</p>
-    <div class="gallery" data-folder="persone" data-slots="6"></div>
+    <p class="lead">Perché nessuno è un prodotto singolo: Elettra funziona meglio in compagnia. Foto e video.</p>
+    <div class="gallery mosaic" data-folder="persone" data-slots="12" data-fill="12" data-label="Foto o video"></div>
   </div>
 </section>
 
@@ -114,7 +114,7 @@
       <article><h3>Dolci</h3><ul class="chips"><li>Profiteroles</li><li>Cioccolata</li><li>Torte con pan di spagna bagnato</li></ul></article>
       <article><h3>Frutta</h3><ul class="chips"><li>Frutti di bosco</li><li>Mirtilli</li><li>Ciliegie</li><li>Mele verdi</li><li>Meloni</li></ul></article>
     </div>
-    <div class="gallery mosaic" data-folder="cibo" data-slots="5" style="margin-top:32px"></div>
+    <div class="gallery mosaic" data-folder="cibo" data-slots="6" style="margin-top:32px"></div>
   </div>
 </section>
 
@@ -124,7 +124,7 @@
   <div class="wrap">
     <h2>Silly pictures</h2>
     <p class="lead">La parte del sistema che non è documentata, ma è la migliore.</p>
-    <div class="gallery mosaic" data-folder="silly" data-slots="8"></div>
+    <div class="gallery mosaic" data-folder="silly" data-slots="12"></div>
   </div>
 </section>
 
@@ -134,7 +134,7 @@
   <div class="wrap">
     <h2>Her vibes</h2>
     <p class="lead">Un moodboard in rosa, bordeaux e viola.</p>
-    <div class="gallery mosaic" data-folder="vibes" data-slots="9"></div>
+    <div class="gallery mosaic" data-folder="vibes" data-slots="12"></div>
     <h3 class="sub">Le sue fragranze preferite</h3>
     <div class="scent">
       <article><h4>Dolce, ma non troppo</h4><p>Una nota golosa che non stucca mai.</p></article>
@@ -170,9 +170,10 @@
   <svg class="lily l-bl bloom" aria-hidden="true"><use href="#lily"/></svg>
   <div class="wrap">
     <h2>La sua musica</h2>
-    <p class="lead">La colonna sonora dei suoi giorni: otto copertine di album o artisti.</p>
-    <!-- Carica le copertine nella cartella "musica" (01.jpg ... 08.jpg) -->
-    <div class="gallery covers" data-folder="musica" data-slots="8"></div>
+    <p class="lead">La colonna sonora dei suoi giorni. Tocca una copertina per ascoltare il brano.</p>
+    <!-- I brani si inseriscono nella tabella "music" di Supabase (vedi supabase-setup.sql).
+         Senza Supabase: copertine in foto/musica/1.jpg... e brani in audio/1.mp3... -->
+    <div class="gallery covers" id="musicGrid" data-slots="8"></div>
   </div>
 </section>
 
@@ -209,7 +210,7 @@
   <div class="wrap">
     <h2>I suoi passatempi</h2>
     <p class="lead">Cosa fa quando ha tempo per sé.</p>
-    <div class="gallery mosaic" data-folder="passatempi" data-slots="5"></div>
+    <div class="gallery mosaic" data-folder="passatempi" data-slots="6"></div>
   </div>
 </section>
 
@@ -254,9 +255,21 @@
   <p><b>Elettra 18.0</b> · edizione limitata, fatta con affetto</p>
 </footer>
 
+<div class="player" id="player" role="dialog" aria-label="Lettore musicale">
+  <button type="button" id="closePlayer" aria-label="Chiudi">×</button>
+  <div class="pcard">
+    <div class="pcover" id="pCover"></div>
+    <h3 id="pTitle"></h3>
+    <p id="pArtist"></p>
+    <audio id="pAudio" controls preload="none"></audio>
+    <p class="pmsg" id="pMsg" hidden></p>
+  </div>
+</div>
+
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Foto ingrandita">
   <button type="button" id="closeBox" aria-label="Chiudi">×</button>
   <img alt="">
+  <video controls playsinline hidden></video>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
