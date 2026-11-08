@@ -5,8 +5,8 @@
 // La chiave anon è fatta per stare nel browser: i permessi li
 // decidono le policy RLS (vedi supabase-setup.sql).
 // ============================================================
-const SUPABASE_URL = 'INCOLLA_QUI_IL_PROJECT_URL';
-const SUPABASE_ANON_KEY = 'INCOLLA_QUI_LA_CHIAVE_ANON';
+const SUPABASE_URL = 'https://tnrpttyhlamcnwravmik.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_3iiRaVZvcvP83fqa28ZPUA_WV4nw1zE';
 
 const configurato = !SUPABASE_URL.startsWith('INCOLLA') && !SUPABASE_ANON_KEY.startsWith('INCOLLA');
 const db = configurato && window.supabase
