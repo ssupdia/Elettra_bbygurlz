@@ -67,14 +67,14 @@
       <p class="date">13 Novembre 2008</p>
       <p class="eyebrow">Chi è questa diva?</p>
       <h1>Birthday<br><i>Elettra 18.0</i></h1>
-      <p>Un’edizione limitata di compleanno, dalla tua [il tuo soprannome]. Dolce ma non troppo, con un lato dark e un finale fruttato.</p>
+      <p>Un’edizione limitata di compleanno, dalla tua <span id="nick">[il tuo soprannome]</span>. Dolce ma non troppo, con un lato dark e un finale fruttato.</p>
       <p class="countdown" id="countdown"></p>
       <div class="btns">
         <a class="btn primary" href="#chi">Scopri chi è</a>
         <a class="btn ghost" href="#lettera">Leggi la lettera</a>
       </div>
     </div>
-    <div class="cover"><div class="gallery" data-folder="cover" data-slots="1" data-fill="1"></div></div>
+    <div class="cover"><div class="gallery" data-file="gey.jpeg"></div></div>
   </div>
 </header>
 
@@ -99,7 +99,7 @@
   <div class="wrap">
     <h2>Lei e le persone che ama</h2>
     <p class="lead">Perché nessuno è un prodotto singolo: Elettra funziona meglio in compagnia. Foto e video.</p>
-    <div class="gallery mosaic" data-folder="persone" data-slots="12" data-fill="12" data-label="Foto o video"></div>
+    <div class="gallery mosaic" data-folder="Persone" data-slots="12" data-fill="12" data-label="Foto o video"></div>
   </div>
 </section>
 
@@ -114,7 +114,7 @@
       <article><h3>Dolci</h3><ul class="chips"><li>Profiteroles</li><li>Cioccolata</li><li>Torte con pan di spagna bagnato</li></ul></article>
       <article><h3>Frutta</h3><ul class="chips"><li>Frutti di bosco</li><li>Mirtilli</li><li>Ciliegie</li><li>Mele verdi</li><li>Meloni</li></ul></article>
     </div>
-    <div class="gallery mosaic" data-folder="cibo" data-slots="6" style="margin-top:32px"></div>
+    <div class="gallery mosaic" data-folder="Cibi" data-slots="6" style="margin-top:32px"></div>
   </div>
 </section>
 
@@ -124,7 +124,7 @@
   <div class="wrap">
     <h2>Silly pictures</h2>
     <p class="lead">La parte del sistema che non è documentata, ma è la migliore.</p>
-    <div class="gallery mosaic" data-folder="silly" data-slots="12"></div>
+    <div class="gallery mosaic" data-folder="Silly" data-slots="12"></div>
   </div>
 </section>
 
@@ -134,7 +134,7 @@
   <div class="wrap">
     <h2>Her vibes</h2>
     <p class="lead">Un moodboard in rosa, bordeaux e viola.</p>
-    <div class="gallery mosaic" data-folder="vibes" data-slots="12"></div>
+    <div class="gallery mosaic" data-folder="Vibes" data-slots="12"></div>
     <h3 class="sub">Le sue fragranze preferite</h3>
     <div class="scent">
       <article><h4>Dolce, ma non troppo</h4><p>Una nota golosa che non stucca mai.</p></article>
@@ -172,7 +172,7 @@
     <h2>La sua musica</h2>
     <p class="lead">La colonna sonora dei suoi giorni. Tocca una copertina per ascoltare il brano.</p>
     <!-- I brani si inseriscono nella tabella "music" di Supabase (vedi supabase-setup.sql).
-         Senza Supabase: copertine in foto/musica/1.jpg... e brani in audio/1.mp3... -->
+         Senza Supabase: copertine in foto/Musica/1.jpeg... e brani in audio/1.mp3... -->
     <div class="gallery covers" id="musicGrid" data-slots="8"></div>
   </div>
 </section>
@@ -183,13 +183,13 @@
   <div class="wrap">
     <h2>Ma dove vorrebbe andare?</h2>
     <p class="lead">I cinque posti in cima alla lista dei viaggi da fare.</p>
-    <!-- Foto di sfondo: cartella "viaggi", file giappone, svezia, kola, argentina, olanda -->
+    <!-- Foto di sfondo: cartella "Luoghi", file 1.jpeg ... 5.jpeg (1 = prima destinazione) -->
     <div class="dests">
-      <article class="dest" data-bgfolder="viaggi" data-bgname="giappone"><span class="n">1</span><h3>Giappone</h3></article>
-      <article class="dest" data-bgfolder="viaggi" data-bgname="svezia"><span class="n">2</span><h3>Svezia</h3></article>
-      <article class="dest" data-bgfolder="viaggi" data-bgname="kola"><span class="n">3</span><h3>Kola</h3></article>
-      <article class="dest" data-bgfolder="viaggi" data-bgname="argentina"><span class="n">4</span><h3>Argentina</h3></article>
-      <article class="dest" data-bgfolder="viaggi" data-bgname="olanda"><span class="n">5</span><h3>Olanda</h3></article>
+      <article class="dest" data-bgfolder="Luoghi" data-bgname="1"><span class="n">1</span><h3>Giappone</h3></article>
+      <article class="dest" data-bgfolder="Luoghi" data-bgname="2"><span class="n">2</span><h3>Svezia</h3></article>
+      <article class="dest" data-bgfolder="Luoghi" data-bgname="3"><span class="n">3</span><h3>Kola</h3></article>
+      <article class="dest" data-bgfolder="Luoghi" data-bgname="4"><span class="n">4</span><h3>Argentina</h3></article>
+      <article class="dest" data-bgfolder="Luoghi" data-bgname="5"><span class="n">5</span><h3>Olanda</h3></article>
     </div>
   </div>
 </section>
@@ -200,7 +200,7 @@
   <div class="wrap">
     <h2>Un po’ di lei in giro per il mondo</h2>
     <p class="lead">Per ora sono i posti in cui è già stata. Il resto arriva nei prossimi aggiornamenti.</p>
-    <div class="gallery mosaic" data-folder="mondo" data-slots="6"></div>
+    <div class="gallery mosaic" data-folder="Mondo" data-slots="6"></div>
   </div>
 </section>
 
@@ -210,7 +210,7 @@
   <div class="wrap">
     <h2>I suoi passatempi</h2>
     <p class="lead">Cosa fa quando ha tempo per sé.</p>
-    <div class="gallery mosaic" data-folder="passatempi" data-slots="6"></div>
+    <div class="gallery mosaic" data-folder="Passatempi" data-slots="6"></div>
   </div>
 </section>
 
@@ -220,10 +220,10 @@
   <div class="wrap">
     <h2>Due modalità di funzionamento</h2>
     <p class="lead">Se Elettra fosse un pony, sarebbe due pony insieme.</p>
-    <!-- Foto di sfondo: cartella "pony", file twilight e pinkie -->
+    <!-- Foto di sfondo: cartella "Pony", file twilight.jpeg e pinkie.jpeg -->
     <div class="modes">
-      <div class="mode t" data-bgfolder="pony" data-bgname="twilight"><h3>Modalità Twilight</h3><p>Studiosa, impegnata, abituata a fare sempre del suo meglio. Ha imparato che stare con gli altri si può, anche senza essere perfetta.</p></div>
-      <div class="mode p" data-bgfolder="pony" data-bgname="pinkie"><h3>Modalità Pinkie Pie</h3><p>Vuole che tutti stiano bene. E da un po’ sta imparando la funzione più difficile: piacere anche a sé stessa.</p></div>
+      <div class="mode t" data-bgfolder="Pony" data-bgname="twilight"><h3>Modalità Twilight</h3><p>Studiosa, impegnata, abituata a fare sempre del suo meglio. Ha imparato che stare con gli altri si può, anche senza essere perfetta.</p></div>
+      <div class="mode p" data-bgfolder="Pony" data-bgname="pinkie"><h3>Modalità Pinkie Pie</h3><p>Vuole che tutti stiano bene. E da un po’ sta imparando la funzione più difficile: piacere anche a sé stessa.</p></div>
     </div>
     <div class="princesses">
       <h3>Principesse preferite</h3>

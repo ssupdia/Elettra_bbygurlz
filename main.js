@@ -5,8 +5,8 @@
 // La chiave anon è fatta per stare nel browser: i permessi li
 // decidono le policy RLS (vedi supabase-setup.sql).
 // ============================================================
-const SUPABASE_URL = 'https://tnrpttyhlamcnwravmik.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_3iiRaVZvcvP83fqa28ZPUA_WV4nw1zE';
+const SUPABASE_URL = 'INCOLLA_QUI_IL_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'INCOLLA_QUI_LA_CHIAVE_ANON';
 
 const configurato = !SUPABASE_URL.startsWith('INCOLLA') && !SUPABASE_ANON_KEY.startsWith('INCOLLA');
 const db = configurato && window.supabase
@@ -112,7 +112,7 @@ function riempiSegnaposto(g) {
   const cartella = g.dataset.folder;
   const n = parseInt(g.dataset.slots, 10) || 6;
   for (let i = 1; i <= n; i++) {
-    const fig = creaFoto('foto/' + cartella + '/' + i + '.jpg', 'Foto ' + i);
+    const fig = creaFoto('foto/' + cartella + '/' + i + '.jpeg', 'Foto ' + i);
     const label = document.createElement('span');
     label.textContent = (g.dataset.label || 'Foto') + ' ' + i;
     fig.prepend(label);
@@ -129,12 +129,24 @@ async function caricaDaSupabase(g) {
       limit: 60, sortBy: { column: 'name', order: 'asc' }
     });
     if (error || !data) return;
-    const file = data.filter(function (f) { return /\.(jpe?g|png|webp|gif|mp4|webm|mov|m4v)$/i.test(f.name); });
+    const file = data.filter(function (f) { return /\.(jpe?g|png|webp|gif|mp4|webm|mov|m4v)$/i.test(f.name); }).sort(ORDINE_NUMERICO);
     if (!file.length) return;
+    // didascalie facoltative dalla tabella photo_captions (solo quelle non vuote)
+    const didascalie = {};
+    try {
+      const r = await db.from('photo_captions').select('file_name, caption').eq('folder', cartella);
+      (r.data || []).forEach(function (x) { if (x.caption) didascalie[x.file_name] = x.caption; });
+    } catch (e) { /* senza didascalie le foto si vedono lo stesso */ }
     g.textContent = '';
     file.forEach(function (f, i) {
       const url = db.storage.from('photos').getPublicUrl(cartella + '/' + f.name).data.publicUrl;
-      g.appendChild(creaFoto(url, 'Elettra, ' + cartella + ' ' + (i + 1)));
+      const fig = creaFoto(url, didascalie[f.name] || ('Elettra, ' + cartella + ' ' + (i + 1)));
+      if (didascalie[f.name]) {
+        const c = document.createElement('figcaption');
+        c.textContent = didascalie[f.name];
+        fig.appendChild(c);
+      }
+      g.appendChild(fig);
     });
     riempiBuchi(g);
   } catch (err) {
@@ -191,7 +203,7 @@ caricaLettera();
 // ---------- Foto di sfondo (destinazioni e pony) ----------
 // Gli elementi con data-bgfolder e data-bgname cercano la foto
 // "cartella/nome.(jpg|jpeg|png|webp)" prima su Supabase, poi in locale (foto/cartella/nome.jpg).
-const ESTENSIONI = ['jpg', 'jpeg', 'png', 'webp'];
+const ESTENSIONI = ['jpeg', 'jpg', 'png', 'webp'];
 const VELO = 'linear-gradient(180deg, rgba(42,13,59,.2), rgba(42,13,59,.85))';
 
 function provaImmagine(url) {
@@ -305,7 +317,7 @@ async function caricaMusica() {
           return {
             artist: r.artist,
             title: r.title,
-            cover: r.cover ? db.storage.from('photos').getPublicUrl('musica/' + r.cover).data.publicUrl : null,
+            cover: r.cover ? db.storage.from('photos').getPublicUrl('Musica/' + r.cover).data.publicUrl : null,
             audio: r.audio ? db.storage.from('audio').getPublicUrl(r.audio).data.publicUrl : null
           };
         });
@@ -314,9 +326,10 @@ async function caricaMusica() {
       console.error('Musica non caricata da Supabase:', err);
     }
   }
+  if (!brani.length && db) brani = await braniDalleCartelle();
   if (!brani.length) {
     const n = parseInt(griglia.dataset.slots, 10) || 8;
-    for (let i = 1; i <= n; i++) brani.push({ artist: '', title: '', cover: 'foto/musica/' + i + '.jpg', audio: 'audio/' + i + '.mp3' });
+    for (let i = 1; i <= n; i++) brani.push({ artist: '', title: '', cover: 'foto/Musica/' + i + '.jpeg', audio: 'audio/' + i + '.mp3' });
   }
   // completa l'ultima riga ripetendo i primi brani, così la griglia non ha buchi
   const originali = brani.length;
@@ -392,3 +405,118 @@ caricaMusica();
     cal.classList.add('visible');
   }
 })();
+
+// ---------- Organizzazione per cartelle (bucket "photos") ----------
+// Cartelle: Cibi, Luoghi, Mondo, Musica, Passatempi, Persone, Silly, Vibes (maiuscole: Supabase distingue).
+// File numerati 1.jpeg, 2.jpeg ... ; brani nel bucket "audio" come 1.mp3, 2.mp3 ...
+// Copertina: gey.jpeg fuori dalle cartelle (nome modificabile dalla tabella site_settings).
+
+// ordina 1, 2, 3 ... 10, 11 (e non 1, 10, 11, 2)
+function ORDINE_NUMERICO(a, b) {
+  return a.name.localeCompare(b.name, undefined, { numeric: true });
+}
+
+// Se la tabella "music" è vuota, abbina da solo Musica/N.jpeg con audio/N.mp3
+async function braniDalleCartelle() {
+  try {
+    const foto = await db.storage.from('photos').list('Musica', { limit: 100 });
+    const audio = await db.storage.from('audio').list('', { limit: 100 });
+    if (foto.error || audio.error || !foto.data || !audio.data) return [];
+    const stem = function (nome) { return nome.replace(/\.[^.]+$/, ''); };
+    const tracce = {};
+    audio.data.forEach(function (f) {
+      if (/\.(mp3|m4a|aac|ogg|wav|webm)$/i.test(f.name)) tracce[stem(f.name)] = f.name;
+    });
+    return foto.data
+      .filter(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name); })
+      .sort(ORDINE_NUMERICO)
+      .map(function (f) {
+        const a = tracce[stem(f.name)];
+        return {
+          artist: '',
+          title: '',
+          cover: db.storage.from('photos').getPublicUrl('Musica/' + f.name).data.publicUrl,
+          audio: a ? db.storage.from('audio').getPublicUrl(a).data.publicUrl : null
+        };
+      });
+  } catch (err) {
+    console.error('Musica dalle cartelle non caricata:', err);
+    return [];
+  }
+}
+
+// Sfondo da un file preciso (cartella + nome completo)
+async function applicaSfondoFile(el, cartella, nomeFile) {
+  const candidati = [];
+  if (db) candidati.push(db.storage.from('photos').getPublicUrl(cartella + '/' + nomeFile).data.publicUrl);
+  candidati.push('foto/' + cartella + '/' + nomeFile);
+  for (const url of candidati) {
+    try {
+      await provaImmagine(url);
+      el.style.backgroundImage = VELO + ', url("' + url + '")';
+      return;
+    } catch (e) { /* prossimo candidato */ }
+  }
+}
+
+// Tabella "destinations": nome, posizione e foto (Luoghi/<photo>)
+async function caricaDestinazioni() {
+  if (!db) return;
+  try {
+    const { data, error } = await db.from('destinations')
+      .select('position, name, photo').order('position', { ascending: true });
+    if (error || !data || !data.length) return;
+    const box = document.querySelector('.dests');
+    box.textContent = '';
+    data.forEach(function (r) {
+      const card = document.createElement('article');
+      card.className = 'dest';
+      const n = document.createElement('span');
+      n.className = 'n';
+      n.textContent = r.position;
+      const h = document.createElement('h3');
+      h.textContent = r.name;
+      card.appendChild(n);
+      card.appendChild(h);
+      box.appendChild(card);
+      if (r.photo) applicaSfondoFile(card, 'Luoghi', r.photo);
+    });
+  } catch (err) {
+    console.error('Destinazioni non caricate da Supabase:', err);
+  }
+}
+
+// Tabella "site_settings": cover_photo (file fuori dalle cartelle) e nickname (soprannome in copertina)
+async function caricaCopertina() {
+  const g = document.querySelector('.gallery[data-file]');
+  let file = g ? g.dataset.file : null;
+  if (db) {
+    try {
+      const { data } = await db.from('site_settings').select('key, value');
+      (data || []).forEach(function (r) {
+        if (r.key === 'cover_photo' && r.value) file = r.value;
+        if (r.key === 'nickname' && r.value) {
+          const nick = document.getElementById('nick');
+          if (nick) nick.textContent = r.value;
+        }
+      });
+    } catch (err) {
+      console.error('Impostazioni non caricate da Supabase:', err);
+    }
+  }
+  if (!g || !file) return;
+  const url = db ? db.storage.from('photos').getPublicUrl(file).data.publicUrl : 'foto/' + file;
+  const fig = creaFoto(url, 'Elettra');
+  const label = document.createElement('span');
+  label.textContent = 'Foto';
+  fig.prepend(label);
+  fig.querySelector('img').onerror = function () {
+    if (this.dataset.locale) { this.remove(); return; }
+    this.dataset.locale = '1';
+    this.src = 'foto/' + file; // seconda possibilità: file locale
+  };
+  g.appendChild(fig);
+}
+
+caricaDestinazioni();
+caricaCopertina();
