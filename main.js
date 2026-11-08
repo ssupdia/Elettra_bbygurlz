@@ -1,14 +1,13 @@
 // ============================================================
-// CONFIGURAZIONE SUPABASE
-// Dashboard di Supabase > Project Settings > API
-// Incolla qui il Project URL e la chiave "anon public".
-// La chiave anon è fatta per stare nel browser: i permessi li
-// decidono le policy RLS (vedi supabase-setup.sql).
+// Le chiavi di Supabase stanno in config.js (così, quando sostituisci
+// main.js con una versione nuova, non perdi il collegamento).
 // ============================================================
-const SUPABASE_URL = 'https://tnrpttyhlamcnwravmik.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_3iiRaVZvcvP83fqa28ZPUA_WV4nw1zE';
+const CONFIG = window.ELETTRA_CONFIG || {};
+const SUPABASE_URL = CONFIG.url || '';
+const SUPABASE_ANON_KEY = CONFIG.key || '';
 
-const configurato = !SUPABASE_URL.startsWith('INCOLLA') && !SUPABASE_ANON_KEY.startsWith('INCOLLA');
+const configurato = SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length > 20
+  && !SUPABASE_URL.includes('INCOLLA') && !SUPABASE_ANON_KEY.includes('INCOLLA');
 const db = configurato && window.supabase
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
@@ -141,6 +140,7 @@ async function caricaDaSupabase(g) {
     file.forEach(function (f, i) {
       const url = db.storage.from('photos').getPublicUrl(cartella + '/' + f.name).data.publicUrl;
       const fig = creaFoto(url, didascalie[f.name] || ('Elettra, ' + cartella + ' ' + (i + 1)));
+      fig.dataset.path = cartella + '/' + f.name; // per la modalità ?debug
       if (didascalie[f.name]) {
         const c = document.createElement('figcaption');
         c.textContent = didascalie[f.name];
@@ -520,3 +520,44 @@ async function caricaCopertina() {
 
 caricaDestinazioni();
 caricaCopertina();
+
+// ---------- Modalità controllo: apri il sito con ?debug in fondo all'indirizzo ----------
+// Ogni foto mostra il suo percorso (es. Cibi/3.jpeg), così vedi subito se è nella sezione giusta.
+if (/[?&]debug(=|&|$)/.test(location.search)) {
+  document.body.classList.add('debug');
+  pannelloControllo();
+}
+
+// Pannello diagnostico: mostra cosa funziona e cosa no nel collegamento con Supabase
+async function pannelloControllo() {
+  const box = document.createElement('pre');
+  box.id = 'debugPanel';
+  document.body.appendChild(box);
+  const righe = [];
+  const scrivi = function (t) { righe.push(t); box.textContent = righe.join('\n'); };
+  scrivi('CONTROLLO COLLEGAMENTO');
+  scrivi(window.supabase ? '✔ libreria Supabase caricata' : '✘ libreria Supabase NON caricata (rete o blocco della CDN)');
+  scrivi(configurato ? '✔ chiavi inserite in config.js' : '✘ chiavi NON inserite: apri config.js e incolla Project URL e chiave anon');
+  if (!db) { scrivi('Senza collegamento il sito usa solo i file locali (cartella foto).'); return; }
+  try {
+    const radice = await db.storage.from('photos').list('', { limit: 100 });
+    const copertina = (document.querySelector('.gallery[data-file]') || {dataset: {}}).dataset.file;
+    if (radice.error) scrivi('✘ bucket photos: ' + radice.error.message);
+    else scrivi((radice.data.some(function (f) { return f.name === copertina; }) ? '✔ ' : '✘ ') + 'copertina ' + copertina + ' fuori dalle cartelle');
+    const cartelle = ['Persone', 'Cibi', 'Silly', 'Vibes', 'Musica', 'Luoghi', 'Mondo', 'Passatempi'];
+    for (const c of cartelle) {
+      const r = await db.storage.from('photos').list(c, { limit: 100 });
+      if (r.error) { scrivi('✘ ' + c + ': ' + r.error.message); continue; }
+      const n = r.data.filter(function (f) { return f.name !== '.emptyFolderPlaceholder'; }).length;
+      scrivi((n ? '✔ ' : '✘ ') + c + ': ' + n + ' file');
+    }
+    const a = await db.storage.from('audio').list('', { limit: 100 });
+    scrivi(a.error ? '✘ bucket audio: ' + a.error.message : (a.data.length ? '✔ ' : '✘ ') + 'audio: ' + a.data.length + ' file');
+    for (const t of ['photo_folders', 'site_settings', 'letter', 'destinations', 'music', 'photo_captions']) {
+      const r = await db.from(t).select('*', { count: 'exact', head: true });
+      scrivi(r.error ? '✘ tabella ' + t + ': ' + r.error.message : '✔ tabella ' + t + ': ' + r.count + ' righe');
+    }
+  } catch (err) {
+    scrivi('✘ errore: ' + err.message);
+  }
+}
