@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2a0d3b">
+<title>Elettra 18.0 · Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Giglio rosa (disegno riutilizzato in tutto il sito) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="pet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbd3e4"/><stop offset="1" stop-color="#e0559a"/></linearGradient>
+    <linearGradient id="pet2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7a9cb"/><stop offset="1" stop-color="#c8207e"/></linearGradient>
+    <g id="petal">
+      <path d="M100 104C66 76 74 28 100 6c26 22 34 70 0 98z" stroke="#a3195f" stroke-opacity=".35"/>
+      <path d="M100 98V26" stroke="#fff" stroke-opacity=".55" stroke-width="2" fill="none"/>
+    </g>
+    <g id="stamen">
+      <path d="M100 100Q92 76 86 58" stroke="#7d1a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="85" cy="54" rx="4" ry="8" transform="rotate(-20 85 54)" fill="#561026"/>
+    </g>
+    <symbol id="lily" viewBox="0 0 200 200">
+      <use href="#petal" fill="url(#pet)" transform="rotate(0 100 100)"/>
+      <use href="#petal" fill="url(#pet)" transform="rotate(120 100 100)"/>
+      <use href="#petal" fill="url(#pet)" transform="rotate(240 100 100)"/>
+      <use href="#petal" fill="url(#pet2)" transform="rotate(60 100 100)"/>
+      <use href="#petal" fill="url(#pet2)" transform="rotate(180 100 100)"/>
+      <use href="#petal" fill="url(#pet2)" transform="rotate(300 100 100)"/>
+      <use href="#stamen" transform="rotate(0 100 100)"/>
+      <use href="#stamen" transform="rotate(60 100 100)"/>
+      <use href="#stamen" transform="rotate(120 100 100)"/>
+      <use href="#stamen" transform="rotate(180 100 100)"/>
+      <use href="#stamen" transform="rotate(240 100 100)"/>
+      <use href="#stamen" transform="rotate(300 100 100)"/>
+      <circle cx="100" cy="100" r="5" fill="#561026"/>
+    </symbol>
+  </defs>
+</svg>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#top">Elettra<b>.18</b></a>
+    <ul>
+      <li><a href="#chi">Chi è</a></li>
+      <li><a href="#cibo">Cibo</a></li>
+      <li><a href="#vibes">Vibes</a></li>
+      <li><a href="#cultura">Cultura pop</a></li>
+      <li><a href="#musica">Musica</a></li>
+      <li><a href="#destinazioni">Viaggi</a></li>
+      <li><a href="#modalita">Modalità</a></li>
+    </ul>
+    <a class="nav-cta" href="#lettera">Apri la lettera</a>
+  </div>
+</nav>
+
+<!-- COPERTINA -->
+<header class="hero" id="top">
+  <svg class="lily l-tr bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <svg class="lily l-bl spin" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap hero-grid">
+    <div>
+      <p class="date">13 Novembre 2008</p>
+      <p class="eyebrow">Chi è questa diva?</p>
+      <h1>Birthday<br><i>Elettra 18.0</i></h1>
+      <p>Un’edizione limitata di compleanno, dalla tua [il tuo soprannome]. Dolce ma non troppo, con un lato dark e un finale fruttato.</p>
+      <p class="countdown" id="countdown"></p>
+      <div class="btns">
+        <a class="btn primary" href="#chi">Scopri chi è</a>
+        <a class="btn ghost" href="#lettera">Leggi la lettera</a>
+      </div>
+    </div>
+    <div class="cover"><div class="gallery" data-folder="cover" data-slots="1"></div></div>
+  </div>
+</header>
+
+<!-- CHI È -->
+<section id="chi">
+  <svg class="lily l-tr" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Scheda tecnica</h2>
+    <p class="lead">Tutto quello che c’è da sapere su Elettra, in una scheda.</p>
+    <div class="spec">
+      <div><h3>Fiore</h3><p>Giglio classico rosa</p></div>
+      <div><h3>Profumo</h3><p>Dolce ma non troppo, dark vibes, fruttato</p></div>
+      <div><h3>Frutta</h3><p>Frutti di bosco, mirtilli, ciliegie, mele verdi, meloni</p></div>
+      <div><h3>Versione</h3><p>18.0, con aggiornamenti continui e nessuna data di scadenza</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- LEI E LE PERSONE CHE AMA -->
+<section class="dark" id="persone">
+  <svg class="lily l-bl bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Lei e le persone che ama</h2>
+    <p class="lead">Perché nessuno è un prodotto singolo: Elettra funziona meglio in compagnia.</p>
+    <div class="gallery" data-folder="persone" data-slots="6"></div>
+  </div>
+</section>
+
+<!-- CIBO -->
+<section id="cibo">
+  <svg class="lily l-tr spin" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>I suoi cibi preferiti</h2>
+    <p class="lead">Ha cucinato, mangiato e non ha lasciato briciole.</p>
+    <div class="menu">
+      <article><h3>Primi</h3><ul class="chips"><li>Pasta al ragù di manzo</li><li>Pasta al ragù di cervo</li><li>Risotti</li></ul></article>
+      <article><h3>Dolci</h3><ul class="chips"><li>Profiteroles</li><li>Cioccolata</li><li>Torte con pan di spagna bagnato</li></ul></article>
+      <article><h3>Frutta</h3><ul class="chips"><li>Frutti di bosco</li><li>Mirtilli</li><li>Ciliegie</li><li>Mele verdi</li><li>Meloni</li></ul></article>
+    </div>
+    <div class="gallery mosaic" data-folder="cibo" data-slots="5" style="margin-top:32px"></div>
+  </div>
+</section>
+
+<!-- SILLY PICTURES -->
+<section class="dark" id="silly">
+  <svg class="lily l-tl" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Silly pictures</h2>
+    <p class="lead">La parte del sistema che non è documentata, ma è la migliore.</p>
+    <div class="gallery mosaic" data-folder="silly" data-slots="8"></div>
+  </div>
+</section>
+
+<!-- VIBES + FRAGRANZE -->
+<section id="vibes">
+  <svg class="lily l-br bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Her vibes</h2>
+    <p class="lead">Un moodboard in rosa, bordeaux e viola.</p>
+    <div class="gallery mosaic" data-folder="vibes" data-slots="9"></div>
+    <h3 class="sub">Le sue fragranze preferite</h3>
+    <div class="scent">
+      <article><h4>Dolce, ma non troppo</h4><p>Una nota golosa che non stucca mai.</p></article>
+      <article><h4>Dark vibes</h4><p>Un fondo scuro, per chi sa che il bello sta anche nelle ombre.</p></article>
+      <article><h4>Fruttato</h4><p>Ciliegie, frutti di bosco e un tocco di mela verde.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- CULTURA POP -->
+<section class="dark" id="cultura">
+  <svg class="lily l-tr" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>La sua cultura pop</h2>
+    <p class="lead">Serie, film, manga, anime e libri che la raccontano meglio di una biografia.</p>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-p="serie">Serie TV</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="film">Film</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="manga">Manga</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="anime">Anime</button>
+      <button class="tab" role="tab" aria-selected="false" data-p="libri">Libri</button>
+    </div>
+    <div class="panel on" id="serie"><div>Criminal Minds</div><div>Solar Opposites</div><div>Disincanto</div><div>Sherlock</div></div>
+    <div class="panel" id="film"><div>Avatar</div><div>Pirati dei Caraibi: la maledizione del forziere fantasma</div><div>Il castello nel cielo</div><div>La città incantata</div><div>Hunger Games (tutti)</div></div>
+    <div class="panel" id="manga"><div>Neon Genesis Evangelion</div><div>Demon Slayer</div></div>
+    <div class="panel" id="anime"><div>Neon Genesis Evangelion</div><div>Demon Slayer</div><div>Il mio matrimonio felice</div><div>Vanitas no Carte</div></div>
+    <div class="panel" id="libri"><div>Hunger Games</div><div>Se i gatti scomparissero dal mondo</div><div>La canzone di Achille</div><div>Twilight</div></div>
+  </div>
+</section>
+
+<!-- MUSICA -->
+<section id="musica">
+  <svg class="lily l-bl bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>La sua musica</h2>
+    <p class="lead">La colonna sonora dei suoi giorni: otto copertine di album o artisti.</p>
+    <!-- Carica le copertine nella cartella "musica" (01.jpg ... 08.jpg) -->
+    <div class="gallery covers" data-folder="musica" data-slots="8"></div>
+  </div>
+</section>
+
+<!-- DOVE VORREBBE ANDARE -->
+<section class="dark" id="destinazioni">
+  <svg class="lily l-tr spin" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Ma dove vorrebbe andare?</h2>
+    <p class="lead">I cinque posti in cima alla lista dei viaggi da fare.</p>
+    <!-- Foto di sfondo: cartella "viaggi", file giappone, svezia, kola, argentina, olanda -->
+    <div class="dests">
+      <article class="dest" data-bgfolder="viaggi" data-bgname="giappone"><span class="n">1</span><h3>Giappone</h3></article>
+      <article class="dest" data-bgfolder="viaggi" data-bgname="svezia"><span class="n">2</span><h3>Svezia</h3></article>
+      <article class="dest" data-bgfolder="viaggi" data-bgname="kola"><span class="n">3</span><h3>Kola</h3></article>
+      <article class="dest" data-bgfolder="viaggi" data-bgname="argentina"><span class="n">4</span><h3>Argentina</h3></article>
+      <article class="dest" data-bgfolder="viaggi" data-bgname="olanda"><span class="n">5</span><h3>Olanda</h3></article>
+    </div>
+  </div>
+</section>
+
+<!-- IN GIRO PER IL MONDO -->
+<section id="mondo">
+  <svg class="lily l-tl bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Un po’ di lei in giro per il mondo</h2>
+    <p class="lead">Per ora sono i posti in cui è già stata. Il resto arriva nei prossimi aggiornamenti.</p>
+    <div class="gallery mosaic" data-folder="mondo" data-slots="6"></div>
+  </div>
+</section>
+
+<!-- PASSATEMPI -->
+<section class="dark" id="passatempi">
+  <svg class="lily l-br" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>I suoi passatempi</h2>
+    <p class="lead">Cosa fa quando ha tempo per sé.</p>
+    <div class="gallery mosaic" data-folder="passatempi" data-slots="5"></div>
+  </div>
+</section>
+
+<!-- MODALITÀ + PRINCIPESSE -->
+<section id="modalita">
+  <svg class="lily l-bl spin" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Due modalità di funzionamento</h2>
+    <p class="lead">Se Elettra fosse un pony, sarebbe due pony insieme.</p>
+    <!-- Foto di sfondo: cartella "pony", file twilight e pinkie -->
+    <div class="modes">
+      <div class="mode t" data-bgfolder="pony" data-bgname="twilight"><h3>Modalità Twilight</h3><p>Studiosa, impegnata, abituata a fare sempre del suo meglio. Ha imparato che stare con gli altri si può, anche senza essere perfetta.</p></div>
+      <div class="mode p" data-bgfolder="pony" data-bgname="pinkie"><h3>Modalità Pinkie Pie</h3><p>Vuole che tutti stiano bene. E da un po’ sta imparando la funzione più difficile: piacere anche a sé stessa.</p></div>
+    </div>
+    <div class="princesses">
+      <h3>Principesse preferite</h3>
+      <ul class="chips"><li>Megara</li><li>Anastasia</li><li>Merida</li><li>Mulan</li><li>Rapunzel</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- LETTERA -->
+<section class="letter-sec center" id="lettera">
+  <svg class="lily l-tr bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <svg class="lily l-bl" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Una lettera per te</h2>
+    <p class="lead">Un messaggio che non è nelle note di rilascio.</p>
+    <div class="envelope">
+      <button class="btn magenta seal" id="openLetter" aria-expanded="false" aria-controls="paper">Apri la lettera</button>
+      <article class="paper" id="paper" hidden>
+        <!-- Testo di riserva: viene sostituito dalla lettera salvata su Supabase -->
+        <p>Cara Elettra,</p>
+        <p>Qui comparirà la tua lettera.</p>
+        <p class="sign">Con affetto</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><b>Elettra 18.0</b> · edizione limitata, fatta con affetto</p>
+</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Foto ingrandita">
+  <button type="button" id="closeBox" aria-label="Chiudi">×</button>
+  <img alt="">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
