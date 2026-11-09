@@ -664,9 +664,37 @@ async function caricaFotoLettera() {
   mostraFoto(box, percorso, ['foto/lettera.jpeg', 'foto/lettera.jpg'], 'Elettra');
 }
 
+// Sticker dei profumi: nella cartella "Profumi" di photos cerca il file che contiene "left" e quello
+// che contiene "right" nel nome (es. profumi_left.png), con qualsiasi estensione; poi i file locali.
+function scegliSticker(nomi, lato) {
+  const rango = function (n) { return /\.png$/i.test(n) ? 0 : /\.webp$/i.test(n) ? 1 : 2; }; // meglio png/webp (trasparenti)
+  return nomi
+    .filter(function (n) { return n.toLowerCase().indexOf(lato) !== -1; })
+    .sort(function (a, b) { return rango(a) - rango(b); })[0] || null;
+}
+
+async function caricaSticker() {
+  const figure = document.querySelectorAll('.sticker[data-sticker]');
+  if (!figure.length) return;
+  let nomi = [];
+  if (db) {
+    try {
+      const r = await db.storage.from('photos').list('Profumi', { limit: 100 });
+      nomi = (r.data || []).filter(function (f) { return /\.(png|webp|jpe?g|gif)$/i.test(f.name); }).map(function (f) { return f.name; });
+    } catch (e) { console.error('Sticker non elencati:', e); }
+  }
+  figure.forEach(function (fig) {
+    const lato = fig.dataset.sticker;
+    const trovato = scegliSticker(nomi, lato);
+    mostraFoto(fig, trovato ? 'Profumi/' + trovato : null,
+      ['foto/Profumi/' + lato + '.png', 'foto/Profumi/profumi_' + lato + '.png'], '');
+  });
+}
+
 caricaDestinazioni();
 caricaCopertina();
 caricaFotoLettera();
+caricaSticker();
 
 // ---------- Modalità controllo: apri il sito con ?debug in fondo all'indirizzo ----------
 // Ogni foto mostra il suo percorso (es. Cibi/3.jpeg), così vedi subito se è nella sezione giusta.
@@ -706,6 +734,9 @@ async function pannelloControllo() {
       const n = r.data.filter(function (f) { return f.name !== '.emptyFolderPlaceholder'; }).length;
       scrivi((n ? '✔ ' : '✘ ') + c + ': ' + n + ' file');
     }
+    const pr = await db.storage.from('photos').list('Profumi', { limit: 100 });
+    scrivi(pr.error ? '✘ cartella Profumi: ' + pr.error.message
+      : 'sticker in Profumi: ' + (pr.data.filter(function (f) { return f.id; }).map(function (f) { return f.name; }).join(', ') || 'nessuno'));
     const a = await db.storage.from('audio').list('', { limit: 100 });
     scrivi(a.error ? '✘ bucket audio: ' + a.error.message : (a.data.length ? '✔ ' : '✘ ') + 'audio: ' + a.data.length + ' file');
     for (const t of ['photo_folders', 'site_settings', 'letter', 'destinations', 'music', 'photo_captions']) {
