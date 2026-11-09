@@ -258,24 +258,30 @@ body.debug .ph[data-path]::before{content:attr(data-path);position:absolute;left
 .mosaic .ph.alta{grid-row:span 2}
 .mosaic .ph.larga{grid-column:span 2}
 
-/* sticker dei profumi */
-.scent-wrap{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:clamp(16px,3vw,40px)}
-.scent-wrap .scent{grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr))}
-.sticker{margin:0;width:clamp(110px,15vw,200px);animation:fluttua 6.5s ease-in-out infinite alternate}
-.sticker.s-right{animation-duration:7.5s;animation-delay:-3s}
-.sticker img{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 22px rgba(86,16,38,.35)) drop-shadow(0 4px 6px rgba(86,16,38,.2))}
-@keyframes fluttua{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-16px) rotate(3deg)}}
-@media(max-width:820px){
-  .scent-wrap{grid-template-columns:minmax(0,1fr);justify-items:center}
-  .scent-wrap .scent{width:100%}
-  .sticker{width:clamp(110px,34vw,170px)}
+/* fragranze: tre card in fila, sticker appoggiati sopra la prima e l'ultima */
+.scent-wrap{--sh:clamp(120px,15vw,190px);--over:46px;position:relative;padding-top:calc(var(--sh) - var(--over) + 12px)}
+.scent-wrap>.sub{position:absolute;top:0;left:0;right:0;height:calc(var(--sh) - var(--over));margin:0;padding:0 clamp(70px,14vw,190px);display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(1.5rem,3.6vw,2rem)}
+.scent-wrap .scent{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,18px)}
+.scent-wrap .scent article{position:relative;padding:calc(var(--over) + 14px) clamp(12px,2vw,26px) 26px}
+.scent-wrap .scent h4{font-size:clamp(1.2rem,2.3vw,1.7rem)}
+.sticker{position:absolute;z-index:3;margin:0;height:var(--sh);bottom:calc(100% - var(--over));pointer-events:none}
+.sticker.s-left{left:-10px;animation:fluttua-sx 6.5s ease-in-out infinite alternate}
+.sticker.s-right{right:-10px;animation:fluttua-dx 7.5s ease-in-out infinite alternate;animation-delay:-3s}
+.sticker img{display:block;height:100%;width:auto;filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 16px 18px rgba(86,16,38,.38))}
+@keyframes fluttua-sx{from{transform:translateY(0) rotate(-7deg)}to{transform:translateY(-12px) rotate(-2deg)}}
+@keyframes fluttua-dx{from{transform:translateY(0) rotate(7deg)}to{transform:translateY(-12px) rotate(2deg)}}
+@media(max-width:700px){
+  .scent-wrap{--sh:clamp(110px,30vw,150px)}
+  .scent-wrap .scent{grid-template-columns:minmax(0,1fr)}
+  .scent-wrap .scent article:last-child{margin-top:calc(var(--sh) - var(--over) + 4px)}
 }
 
 /* lettera con foto laterale */
 .letter-grid{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,1.2fr);gap:clamp(24px,5vw,64px);align-items:start;max-width:1000px;margin:0 auto;text-align:left}
 .letter-grid:has(.letter-photo[hidden]){grid-template-columns:minmax(0,1fr);max-width:680px}
 .letter-photo{margin:0;position:sticky;top:84px;aspect-ratio:3/4;border-radius:28px;overflow:hidden;background:linear-gradient(160deg,var(--rose),var(--violet));box-shadow:0 30px 60px rgba(86,16,38,.3),0 6px 14px rgba(86,16,38,.15);animation:respira 9s ease-in-out infinite alternate}
-.letter-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.letter-photo{display:grid;place-items:center;color:#fff;text-align:center;padding:16px;font-size:.95rem}
+.letter-photo img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
 @keyframes respira{from{transform:rotate(-1.4deg) translateY(0)}to{transform:rotate(1.2deg) translateY(-8px)}}
 .letter-grid .envelope{max-width:none;margin:0;text-align:center}
 @media(max-width:820px){

@@ -548,44 +548,125 @@ async function caricaDestinazioni() {
   }
 }
 
-// Tabella "site_settings": cover_photo (file fuori dalle cartelle) e nickname (soprannome in copertina)
-async function caricaCopertina() {
-  const g = document.querySelector('.gallery[data-file]');
-  let file = g ? g.dataset.file : null;
-  if (db) {
+// ---------- Impostazioni, copertina e foto della lettera ----------
+let _impostazioni = null;
+let _radice = null;
+
+// Tabella "site_settings": cover_photo, letter_photo, nickname
+function leggiImpostazioni() {
+  if (_impostazioni) return _impostazioni;
+  _impostazioni = (async function () {
+    const imp = {};
+    if (!db) return imp;
     try {
       const { data } = await db.from('site_settings').select('key, value');
-      (data || []).forEach(function (r) {
-        if (r.key === 'cover_photo' && r.value) file = r.value;
-        if (r.key === 'nickname' && r.value) {
-          const nick = document.getElementById('nick');
-          if (nick) nick.textContent = r.value;
-        }
-      });
+      (data || []).forEach(function (r) { imp[r.key] = r.value; });
     } catch (err) {
       console.error('Impostazioni non caricate da Supabase:', err);
     }
+    return imp;
+  })();
+  return _impostazioni;
+}
+
+// File (non cartelle) nella radice del bucket photos
+function fileNellaRadice() {
+  if (_radice) return _radice;
+  _radice = (async function () {
+    if (!db) return [];
+    try {
+      const r = await db.storage.from('photos').list('', { limit: 100 });
+      return (r.data || [])
+        .filter(function (f) { return f.id && /\.(jpe?g|png|webp|gif)$/i.test(f.name); })
+        .map(function (f) { return f.name; });
+    } catch (e) { return []; }
+  })();
+  return _radice;
+}
+
+function radiceNome(n) { return n.replace(/\.[^.]+$/, '').toLowerCase(); }
+
+// Trova il file voluto anche se cambia l'estensione (gey.jpg / gey.jpeg) o le maiuscole
+function scegliFile(nomi, voluto) {
+  if (!voluto) return null;
+  return nomi.find(function (n) { return n.toLowerCase() === voluto.toLowerCase(); })
+    || nomi.find(function (n) { return radiceNome(n) === radiceNome(voluto); })
+    || null;
+}
+
+// Mostra una foto nel contenitore: link pubblico, poi link temporaneo, poi file locali.
+function mostraFoto(box, percorso, locali, alt) {
+  const img = document.createElement('img');
+  img.alt = alt;
+  const candidati = [];
+  if (db && percorso) {
+    candidati.push(db.storage.from('photos').getPublicUrl(percorso).data.publicUrl);
+    candidati.push(null); // null = link temporaneo
   }
-  if (!g || !file) return;
-  const url = db ? db.storage.from('photos').getPublicUrl(file).data.publicUrl : 'foto/' + file;
-  const fig = creaFoto(url, 'Elettra');
+  locali.forEach(function (l) { candidati.push(l); });
+  let i = 0;
+  async function prossimo() {
+    while (i < candidati.length) {
+      let url = candidati[i++];
+      if (url === null) url = await urlFirmato('photos', percorso);
+      if (url) { img.src = url; return; }
+    }
+    img.remove();
+  }
+  img.onerror = prossimo;
+  prossimo();
+  box.appendChild(img);
+}
+
+// Copertina: il file indicato (gey.jpeg); se non lo trova, cerca gey.* o la prima immagine nella radice
+async function caricaCopertina() {
+  const g = document.querySelector('.gallery[data-file]');
+  if (!g) return;
+  const imp = await leggiImpostazioni();
+  if (imp.nickname) {
+    const nick = document.getElementById('nick');
+    if (nick) nick.textContent = imp.nickname;
+  }
+  const voluto = imp.cover_photo || g.dataset.file;
+  let nome = voluto;
+  if (db) {
+    const nomi = await fileNellaRadice();
+    nome = scegliFile(nomi, voluto) || scegliFile(nomi, g.dataset.file) || scegliFile(nomi, 'gey')
+      || nomi.find(function (n) { return !/^lettera/i.test(n); }) || voluto;
+  }
+  const fig = document.createElement('figure');
+  fig.className = 'ph';
   const label = document.createElement('span');
   label.textContent = 'Foto';
-  fig.prepend(label);
-  fig.querySelector('img').onerror = async function () {
-    if (!this.dataset.passo) { // 1) link temporaneo (serve se il bucket non è pubblico)
-      this.dataset.passo = '1';
-      const u = db ? await urlFirmato('photos', file) : null;
-      if (u) { this.src = u; return; }
-    }
-    if (this.dataset.passo === '1') { this.dataset.passo = '2'; this.src = 'foto/' + file; return; } // 2) file locale
-    this.remove();
-  };
+  fig.appendChild(label);
   g.appendChild(fig);
+  mostraFoto(fig, nome, ['foto/' + nome, 'foto/gey.jpeg', 'foto/gey.jpg'], 'Elettra');
+}
+
+// Foto accanto alla lettera: lettera.* nella radice, oppure la prima della cartella "Lettera", oppure foto/lettera.jpeg
+async function caricaFotoLettera() {
+  const box = document.getElementById('letterPhoto');
+  if (!box) return;
+  let percorso = null;
+  if (db) {
+    const imp = await leggiImpostazioni();
+    percorso = scegliFile(await fileNellaRadice(), imp.letter_photo || 'lettera.jpeg');
+    if (!percorso) {
+      try {
+        const r = await db.storage.from('photos').list('Lettera', { limit: 100 });
+        const primo = (r.data || [])
+          .filter(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name); })
+          .sort(ORDINE_NUMERICO)[0];
+        if (primo) percorso = 'Lettera/' + primo.name;
+      } catch (e) { /* si usa il file locale */ }
+    }
+  }
+  mostraFoto(box, percorso, ['foto/lettera.jpeg', 'foto/lettera.jpg'], 'Elettra');
 }
 
 caricaDestinazioni();
 caricaCopertina();
+caricaFotoLettera();
 
 // ---------- Modalità controllo: apri il sito con ?debug in fondo all'indirizzo ----------
 // Ogni foto mostra il suo percorso (es. Cibi/3.jpeg), così vedi subito se è nella sezione giusta.
@@ -610,6 +691,7 @@ async function pannelloControllo() {
     const copertina = (document.querySelector('.gallery[data-file]') || {dataset: {}}).dataset.file;
     if (radice.error) scrivi('✘ bucket photos: ' + radice.error.message);
     else scrivi((radice.data.some(function (f) { return f.name === copertina; }) ? '✔ ' : '✘ ') + 'copertina ' + copertina + ' fuori dalle cartelle');
+    if (!radice.error) scrivi('file nella radice di photos: ' + (radice.data.filter(function (f) { return f.id; }).map(function (f) { return f.name; }).join(', ') || 'nessuno'));
     const prova = await db.storage.from('photos').list('Cibi', { limit: 10 });
     const primo = (prova.data || []).find(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name); });
     if (primo) {

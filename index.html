@@ -7,7 +7,7 @@
 <title>Elettra 18.0 · Birthday</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Serif:ital@0;1&family=Pinyon+Script&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
@@ -136,15 +136,19 @@
     <h2>Her vibes</h2>
     <p class="lead">Un moodboard in rosa, bordeaux e viola.</p>
     <div class="gallery mosaic" data-folder="Vibes" data-slots="12"></div>
-    <h3 class="sub">Le sue fragranze preferite</h3>
     <div class="scent-wrap">
-      <figure class="sticker s-left" data-avvolgi><img src="foto/Profumi/left.png" alt="" data-bucket="photos" data-percorso="Profumi/left.png" data-nascondi></figure>
+      <h3 class="sub">Le sue fragranze preferite</h3>
       <div class="scent">
-      <article><h4>Dolce, ma non troppo</h4><p>Una nota golosa che non stucca mai.</p></article>
-      <article><h4>Dark vibes</h4><p>Un fondo scuro, per chi sa che il bello sta anche nelle ombre.</p></article>
-      <article><h4>Fruttato</h4><p>Ciliegie, frutti di bosco e un tocco di mela verde.</p></article>
+        <article>
+          <figure class="sticker s-left" data-avvolgi><img src="foto/Profumi/left.png" alt="" data-bucket="photos" data-percorso="Profumi/left.png" data-nascondi></figure>
+          <h4>Dolce, ma non troppo</h4><p>Una nota golosa che non stucca mai.</p>
+        </article>
+        <article><h4>Dark vibes</h4><p>Un fondo scuro, per chi sa che il bello sta anche nelle ombre.</p></article>
+        <article>
+          <figure class="sticker s-right" data-avvolgi><img src="foto/Profumi/right.png" alt="" data-bucket="photos" data-percorso="Profumi/right.png" data-nascondi></figure>
+          <h4>Fruttato</h4><p>Ciliegie, frutti di bosco e un tocco di mela verde.</p>
+        </article>
       </div>
-      <figure class="sticker s-right" data-avvolgi><img src="foto/Profumi/right.png" alt="" data-bucket="photos" data-percorso="Profumi/right.png" data-nascondi></figure>
     </div>
   </div>
 </section>
@@ -259,9 +263,7 @@
     <h2>Una lettera per te</h2>
     <p class="lead">Un messaggio che non è nelle note di rilascio.</p>
     <div class="letter-grid">
-      <figure class="letter-photo" data-avvolgi>
-        <img src="foto/lettera.jpeg" alt="Elettra" data-bucket="photos" data-percorso="lettera.jpeg" data-nascondi>
-      </figure>
+      <figure class="letter-photo" id="letterPhoto"><span>Foto per la lettera</span></figure>
     <div class="envelope">
       <button class="btn magenta seal" id="openLetter" aria-expanded="false" aria-controls="paper">Apri la lettera</button>
       <article class="paper" id="paper" hidden>
@@ -300,7 +302,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="config.js?v=6"></script>
-<script src="main.js?v=6"></script>
+<script src="config.js?v=7"></script>
+<script src="main.js?v=7"></script>
 </body>
 </html>
