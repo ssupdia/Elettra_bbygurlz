@@ -258,22 +258,23 @@ body.debug .ph[data-path]::before{content:attr(data-path);position:absolute;left
 .mosaic .ph.alta{grid-row:span 2}
 .mosaic .ph.larga{grid-column:span 2}
 
-/* fragranze: tre card in fila, sticker appoggiati sopra la prima e l'ultima */
-.scent-wrap{--sh:clamp(120px,15vw,190px);--over:46px;position:relative;padding-top:calc(var(--sh) - var(--over) + 12px)}
-.scent-wrap>.sub{position:absolute;top:0;left:0;right:0;height:calc(var(--sh) - var(--over));margin:0;padding:0 clamp(70px,14vw,190px);display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(1.5rem,3.6vw,2rem)}
+/* fragranze: tre card in fila, sticker sul lato della prima e dell'ultima, centrati con il testo */
+.scent-wrap{--sh:clamp(110px,13vw,165px);position:relative}
+.scent-wrap>.sub{text-align:center;margin:56px 0 28px;font-size:clamp(1.5rem,3.6vw,2rem)}
 .scent-wrap .scent{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,18px)}
-.scent-wrap .scent article{position:relative;padding:calc(var(--over) + 14px) clamp(12px,2vw,26px) 26px}
+.scent-wrap .scent article{position:relative;padding:30px clamp(12px,2vw,26px)}
+.scent-wrap .scent article:first-child{padding-left:calc(var(--sh) * .3625 + 4px)}
+.scent-wrap .scent article:last-child{padding-right:calc(var(--sh) * .222 + 14px)}
 .scent-wrap .scent h4{font-size:clamp(1.2rem,2.3vw,1.7rem)}
-.sticker{position:absolute;z-index:3;margin:0;height:var(--sh);bottom:calc(100% - var(--over));pointer-events:none}
-.sticker.s-left{left:-10px;animation:fluttua-sx 6.5s ease-in-out infinite alternate}
+.sticker{position:absolute;z-index:3;margin:0;height:var(--sh);top:50%;translate:0 -50%;pointer-events:none}
+.sticker.s-left{left:-14px;animation:fluttua-sx 6.5s ease-in-out infinite alternate}
 .sticker.s-right{right:-10px;animation:fluttua-dx 7.5s ease-in-out infinite alternate;animation-delay:-3s}
 .sticker img{display:block;height:100%;width:auto;filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 16px 18px rgba(86,16,38,.38))}
-@keyframes fluttua-sx{from{transform:translateY(0) rotate(-7deg)}to{transform:translateY(-12px) rotate(-2deg)}}
-@keyframes fluttua-dx{from{transform:translateY(0) rotate(7deg)}to{transform:translateY(-12px) rotate(2deg)}}
+@keyframes fluttua-sx{from{transform:translateY(0) rotate(-7deg)}to{transform:translateY(-10px) rotate(-2deg)}}
+@keyframes fluttua-dx{from{transform:translateY(0) rotate(7deg)}to{transform:translateY(-10px) rotate(2deg)}}
 @media(max-width:700px){
   .scent-wrap{--sh:clamp(110px,30vw,150px)}
   .scent-wrap .scent{grid-template-columns:minmax(0,1fr)}
-  .scent-wrap .scent article:last-child{margin-top:calc(var(--sh) - var(--over) + 4px)}
 }
 
 /* lettera con foto laterale */
