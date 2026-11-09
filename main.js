@@ -229,6 +229,7 @@ caricaLettera();
 // "cartella/nome.(jpg|jpeg|png|webp)" prima su Supabase, poi in locale (foto/cartella/nome.jpg).
 const ESTENSIONI = ['jpeg', 'jpg', 'png', 'webp'];
 const VELO = 'linear-gradient(180deg, rgba(42,13,59,.2), rgba(42,13,59,.85))';
+const VELO_LEGGERO = 'linear-gradient(180deg, rgba(42,13,59,.05), rgba(42,13,59,.35))';
 
 function provaImmagine(url) {
   return new Promise(function (ok, no) {
@@ -240,7 +241,8 @@ function provaImmagine(url) {
 }
 
 function impostaSfondo(el, url) {
-  el.style.backgroundImage = VELO + ', url("' + url + '")';
+  const velo = el.dataset.velo === 'leggero' ? VELO_LEGGERO : VELO;
+  el.style.backgroundImage = velo + ', url("' + url + '")';
   el.style.backgroundSize = 'cover';
   el.style.backgroundPosition = 'center';
   el.style.backgroundRepeat = 'no-repeat';
