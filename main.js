@@ -239,7 +239,38 @@ function provaImmagine(url) {
   });
 }
 
+function impostaSfondo(el, url) {
+  el.style.backgroundImage = VELO + ', url("' + url + '")';
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center';
+  el.style.backgroundRepeat = 'no-repeat';
+}
+
+// Nella cartella sceglie il file il cui nome contiene "nome" (es. twilight) oppure il numero indicato (es. 1.jpeg)
+function scegliPerNome(nomi, nome, numero) {
+  const stem = function (n) { return n.replace(/\.[^.]+$/, '').toLowerCase(); };
+  return nomi.find(function (n) { return nome && stem(n).indexOf(nome.toLowerCase()) !== -1; })
+    || nomi.find(function (n) { return numero && stem(n) === String(numero); })
+    || null;
+}
+
+async function cercaNellaCartella(cartella, nome, numero) {
+  for (const c of [cartella, cartella.toLowerCase()]) { // Supabase distingue le maiuscole
+    try {
+      const r = await db.storage.from('photos').list(c, { limit: 100 });
+      const nomi = (r.data || []).filter(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name); }).map(function (f) { return f.name; });
+      const file = scegliPerNome(nomi, nome, numero);
+      if (file) return { cartella: c, file: file };
+    } catch (e) { /* prossima variante */ }
+  }
+  return null;
+}
+
 async function applicaSfondo(el) {
+  if (db && el.dataset.bgnum) { // es. cartella Pony: twilight.jpeg / pinkie.jpeg oppure 1.jpeg / 2.jpeg
+    const t = await cercaNellaCartella(el.dataset.bgfolder, el.dataset.bgname, el.dataset.bgnum);
+    if (t) { await applicaSfondoFile(el, t.cartella, t.file); return; }
+  }
   const file = el.dataset.bgfolder + '/' + el.dataset.bgname;
   const candidati = [];
   if (db) ESTENSIONI.forEach(function (ext) {
@@ -249,7 +280,7 @@ async function applicaSfondo(el) {
   for (const url of candidati) {
     try {
       await provaImmagine(url);
-      el.style.backgroundImage = VELO + ', url("' + url + '")';
+      impostaSfondo(el, url);
       return;
     } catch (e) { /* prossimo candidato */ }
   }
@@ -257,7 +288,7 @@ async function applicaSfondo(el) {
     for (const ext of ESTENSIONI) {
       const u = await urlFirmato('photos', file + '.' + ext);
       if (!u) continue;
-      try { await provaImmagine(u); el.style.backgroundImage = VELO + ', url("' + u + '")'; return; } catch (e) { /* niente */ }
+      try { await provaImmagine(u); impostaSfondo(el, u); return; } catch (e) { /* niente */ }
     }
   }
 }
@@ -511,13 +542,13 @@ async function applicaSfondoFile(el, cartella, nomeFile) {
   for (const url of candidati) {
     try {
       await provaImmagine(url);
-      el.style.backgroundImage = VELO + ', url("' + url + '")';
+      impostaSfondo(el, url);
       return;
     } catch (e) { /* prossimo candidato */ }
   }
   if (db) {
     const u = await urlFirmato('photos', cartella + '/' + nomeFile);
-    if (u) { try { await provaImmagine(u); el.style.backgroundImage = VELO + ', url("' + u + '")'; } catch (e) { /* niente */ } }
+    if (u) { try { await provaImmagine(u); impostaSfondo(el, u); } catch (e) { /* niente */ } }
   }
 }
 
@@ -734,6 +765,9 @@ async function pannelloControllo() {
       const n = r.data.filter(function (f) { return f.name !== '.emptyFolderPlaceholder'; }).length;
       scrivi((n ? '✔ ' : '✘ ') + c + ': ' + n + ' file');
     }
+    const po = await db.storage.from('photos').list('Pony', { limit: 100 });
+    scrivi(po.error ? '✘ cartella Pony: ' + po.error.message
+      : 'pony in Pony: ' + (po.data.filter(function (f) { return f.id; }).map(function (f) { return f.name; }).join(', ') || 'nessuno'));
     const pr = await db.storage.from('photos').list('Profumi', { limit: 100 });
     scrivi(pr.error ? '✘ cartella Profumi: ' + pr.error.message
       : 'sticker in Profumi: ' + (pr.data.filter(function (f) { return f.id; }).map(function (f) { return f.name; }).join(', ') || 'nessuno'));

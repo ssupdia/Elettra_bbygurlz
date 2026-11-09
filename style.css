@@ -336,3 +336,6 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
   .vinile{transform:translateX(35.1%)}
   .stage .pcover{transform:none}
 }
+
+/* pony: la foto di sfondo deve riempire la card (le regole .mode.t/.mode.p azzeravano "cover") */
+.mode.t,.mode.p{background-size:cover;background-position:center;background-repeat:no-repeat}
