@@ -370,3 +370,12 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
 .cell.party .num{color:var(--violet);font-weight:600}
 .cell.party::before{content:"";position:absolute;inset:3px 4px;border:2px dashed var(--violet);border-radius:50%;opacity:.55;pointer-events:none}
 .cell.party .label{width:100%;top:66%;transform:translate(-50%,-50%) rotate(-6deg);color:var(--violet)}
+
+/* v13: rosa più visibile nelle sezioni chiare (prima era quasi bianco) */
+:root{--rosa-sez:#f8cbe0}
+body{background:var(--rosa-sez)}
+section:not(.dark):not(.letter-sec){background:var(--rosa-sez)}
+.letter-sec{background:linear-gradient(180deg,var(--rosa-sez),#f1b0cd)}
+.spec div{background:#fdeff5}
+.princesses .chips li{background:#fdeff5}
+.menu article{background:rgba(255,255,255,.4);border-color:rgba(200,32,126,.28)}
