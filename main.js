@@ -208,20 +208,39 @@ async function caricaLettera() {
 }
 caricaLettera();
 
-// ---------- Conto alla rovescia: venerdì 13 novembre 2026 ----------
+// ---------- Conti alla rovescia: compleanno (13 novembre) e festa (15 novembre) ----------
 (function () {
-  const el = document.getElementById('countdown');
-  const traguardo = new Date(2026, 10, 13, 0, 0, 0); // mese 10 = novembre
-  function aggiorna() {
-    const ms = traguardo - new Date();
-    if (ms <= 0) { el.textContent = 'Oggi è il grande giorno: buon compleanno!'; return; }
+  // ORARIO DELLA FESTA: cambia questi due numeri con l'ora vera (es. 18 e 30). A 0 e 0 conta fino a mezzanotte.
+  const FESTA_ORA = 0, FESTA_MINUTI = 0;
+  const COMPLEANNO = new Date(2026, 10, 13, 0, 0, 0);          // mese 10 = novembre
+  const FINE_COMPLEANNO = new Date(2026, 10, 14, 0, 0, 0);
+  const FESTA = new Date(2026, 10, 15, FESTA_ORA, FESTA_MINUTI, 0);
+  const FINE_FESTA = new Date(2026, 10, 16, 0, 0, 0);
+  const elC = document.getElementById('countdown');
+  const elF = document.getElementById('countdownFesta');
+
+  function plurale(n, uno, molti) { return n + ' ' + (n === 1 ? uno : molti); }
+  function mancano(ms) {
     const giorni = Math.floor(ms / 86400000);
     const ore = Math.floor(ms % 86400000 / 3600000);
     const min = Math.floor(ms % 3600000 / 60000);
-    el.textContent = 'Mancano ' + giorni + (giorni === 1 ? ' giorno, ' : ' giorni, ') + ore + (ore === 1 ? ' ora e ' : ' ore e ') + min + (min === 1 ? ' minuto' : ' minuti') + ' a venerdì 13.';
+    return 'Mancano ' + plurale(giorni, 'giorno', 'giorni') + ', ' + plurale(ore, 'ora', 'ore') + ' e ' + plurale(min, 'minuto', 'minuti');
+  }
+  function aggiorna() {
+    const ora = new Date();
+    if (elC) {
+      if (ora < COMPLEANNO) elC.textContent = mancano(COMPLEANNO - ora) + ' al compleanno · ven 13 nov';
+      else if (ora < FINE_COMPLEANNO) elC.textContent = 'Oggi è il grande giorno: buon compleanno!';
+      else elC.textContent = 'Il 13 è passato, ma la versione 18.0 è appena partita.';
+    }
+    if (elF) {
+      if (ora < FESTA) elF.textContent = mancano(FESTA - ora) + ' alla festa · dom 15 nov';
+      else if (ora < FINE_FESTA) elF.textContent = 'È il momento della festa: divertitevi!';
+      else elF.textContent = 'La festa è finita, ma i ricordi restano.';
+    }
   }
   aggiorna();
-  setInterval(aggiorna, 60000);
+  setInterval(aggiorna, 30000);
 })();
 
 // ---------- Foto di sfondo (destinazioni e pony) ----------
@@ -430,7 +449,7 @@ caricaMusica();
 
 // ---------- Calendario: novembre 2026, venerdì 13 cerchiato con un cuore ----------
 (function () {
-  const ANNO = 2026, MESE = 10, GIORNO = 13; // MESE: 0 = gennaio, 10 = novembre
+  const ANNO = 2026, MESE = 10, GIORNO = 13, FESTA = 15; // MESE: 0 = gennaio, 10 = novembre
   const cal = document.getElementById('cal');
   if (!cal) return;
   const mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
@@ -480,6 +499,14 @@ caricaMusica();
       etichetta.className = 'label';
       etichetta.textContent = 'Elettra’s birthday';
       cella.appendChild(etichetta);
+    }
+    if (!cella.classList.contains('off') && n === FESTA) {
+      cella.classList.add('party');
+      cella.setAttribute('aria-label', giorni[i % 7] + ' ' + n + ' ' + mesi[MESE].toLowerCase() + ' ' + ANNO + ': festa di compleanno');
+      const et = document.createElement('span');
+      et.className = 'label';
+      et.textContent = 'Festa';
+      cella.appendChild(et);
     }
     griglia.appendChild(cella);
   }

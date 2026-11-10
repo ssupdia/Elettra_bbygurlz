@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#2a0d3b">
 <title>Elettra 18.0 · Birthday</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Serif:ital@0;1&family=Pinyon+Script&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 
@@ -46,12 +47,17 @@
   <div class="wrap">
     <a class="logo" href="#top">Elettra<b>.18</b></a>
     <ul>
+      <li><a href="#calendario">Calendario</a></li>
       <li><a href="#chi">Chi è</a></li>
+      <li><a href="#persone">Persone</a></li>
       <li><a href="#cibo">Cibo</a></li>
+      <li><a href="#silly">Silly</a></li>
       <li><a href="#vibes">Vibes</a></li>
       <li><a href="#cultura">Cultura pop</a></li>
       <li><a href="#musica">Musica</a></li>
       <li><a href="#destinazioni">Viaggi</a></li>
+      <li><a href="#mondo">Mondo</a></li>
+      <li><a href="#passatempi">Passatempi</a></li>
       <li><a href="#modalita">Modalità</a></li>
     </ul>
     <a class="nav-cta" href="#lettera">Apri la lettera</a>
@@ -68,8 +74,11 @@
       <p class="date">13 Novembre 2008</p>
       <p class="eyebrow">Chi è questa diva?</p>
       <h1>Birthday<br><i>Elettra 18.0</i></h1>
-      <p>Un’edizione limitata di compleanno, dalla tua <span id="nick">[il tuo soprannome]</span>. Dolce ma non troppo, con un lato dark e un finale fruttato.</p>
-      <p class="countdown" id="countdown"></p>
+      <p>Un’edizione limitata di compleanno, dalla tua <span id="nick">Pookie🤍</span>. Dolce ma non troppo, con un lato dark e un finale fruttato.</p>
+      <div class="countdowns">
+        <p class="countdown" id="countdown"></p>
+        <p class="countdown" id="countdownFesta"></p>
+      </div>
       <div class="btns">
         <a class="btn primary" href="#chi">Scopri chi è</a>
         <a class="btn ghost" href="#lettera">Leggi la lettera</a>
@@ -78,6 +87,20 @@
     <div class="cover"><div class="gallery" data-file="gey.jpeg"></div></div>
   </div>
 </header>
+
+<!-- CALENDARIO -->
+<section class="dark" id="calendario">
+  <svg class="lily l-tl bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <svg class="lily l-br" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="wrap">
+    <h2>Segnatelo sul calendario</h2>
+    <p class="lead">Venerdì 13 novembre 2026 è il giorno, cerchiato con un cuore come tutte le date che contano. Domenica 15 c’è la festa.</p>
+    <div class="cal" id="cal">
+      <div class="cal-head"><span id="calMese"></span><span id="calAnno"></span></div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+</section>
 
 <!-- CHI È -->
 <section id="chi">
@@ -241,20 +264,6 @@
   </div>
 </section>
 
-<!-- CALENDARIO -->
-<section class="dark" id="calendario">
-  <svg class="lily l-tl bloom" aria-hidden="true"><use href="#lily"/></svg>
-  <svg class="lily l-br" aria-hidden="true"><use href="#lily"/></svg>
-  <div class="wrap">
-    <h2>Segnatelo sul calendario</h2>
-    <p class="lead">Venerdì 13 novembre 2026. Cerchiato con un cuore, come tutte le date che contano.</p>
-    <div class="cal" id="cal">
-      <div class="cal-head"><span id="calMese"></span><span id="calAnno"></span></div>
-      <div class="cal-grid" id="calGrid"></div>
-    </div>
-  </div>
-</section>
-
 <!-- LETTERA -->
 <section class="letter-sec center" id="lettera">
   <svg class="lily l-tr bloom" aria-hidden="true"><use href="#lily"/></svg>
@@ -303,6 +312,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js?v=11"></script>
-<script src="main.js?v=11"></script>
+<script src="main.js?v=12"></script>
 </body>
 </html>
