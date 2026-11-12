@@ -38,6 +38,57 @@ btnLetter.addEventListener('click', function () {
   if (aperta) paper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
 
+// ---------- Prima e dopo: a tutto schermo dopo la lettera ----------
+(function () {
+  const ba = document.getElementById('ba');
+  if (!ba) return;
+  const bottoneX = document.getElementById('baClose');
+  const fine = document.getElementById('baFine');
+  const rivedi = document.getElementById('baReplay');
+  const sito = document.querySelectorAll('body > nav, body > header, body > section, body > footer');
+  let apertoDa = null, giaMostrato = false, attesa = null, chiusura = null;
+
+  function apri() {
+    if (ba.classList.contains('on') && !ba.classList.contains('out')) return;
+    clearTimeout(chiusura);
+    apertoDa = document.activeElement;
+    ba.classList.remove('out', 'in');
+    ba.classList.add('on');
+    void ba.offsetWidth; // l'animazione riparte da capo anche alla seconda apertura
+    ba.classList.add('in');
+    document.documentElement.classList.add('ba-aperto');
+    sito.forEach(function (el) { el.inert = true; });
+    bottoneX.focus({ preventScroll: true });
+  }
+  function chiudi() {
+    if (!ba.classList.contains('on') || ba.classList.contains('out')) return;
+    ba.classList.remove('in');
+    ba.classList.add('out');
+    sito.forEach(function (el) { el.inert = false; });
+    document.documentElement.classList.remove('ba-aperto');
+    chiusura = setTimeout(function () {
+      ba.classList.remove('on', 'out');
+      if (apertoDa && apertoDa.focus) apertoDa.focus({ preventScroll: true });
+    }, 520);
+  }
+  bottoneX.addEventListener('click', chiudi);
+  rivedi.addEventListener('click', apri);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') chiudi(); });
+
+  // Quando la lettera è aperta compare il pulsante; appena arriva in vista, dopo un istante parte da solo (una volta sola)
+  btnLetter.addEventListener('click', function () { if (!paper.hidden) fine.hidden = false; });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (voci) {
+      voci.forEach(function (v) {
+        clearTimeout(attesa);
+        if (v.isIntersecting && !fine.hidden && !giaMostrato && !ba.classList.contains('on')) {
+          attesa = setTimeout(function () { giaMostrato = true; apri(); }, 1400);
+        }
+      });
+    }, { threshold: 0.9 }).observe(fine);
+  }
+})();
+
 // ---------- Lightbox ----------
 const box = document.getElementById('lightbox');
 const boxImg = box.querySelector('img');
@@ -724,6 +775,17 @@ async function caricaFotoLettera() {
   mostraFoto(box, percorso, ['foto/lettera.jpeg', 'foto/lettera.jpg'], 'Elettra');
 }
 
+// Prima e dopo: prima.* e dopo.* nella radice di photos, oppure foto/prima.jpeg e foto/dopo.jpeg
+async function caricaPrimaDopo() {
+  const nomi = db ? await fileNellaRadice() : [];
+  [['baPrima', 'prima'], ['baDopo', 'dopo']].forEach(function (c) {
+    const box = document.querySelector('#' + c[0] + ' .ba-img');
+    if (!box) return;
+    const percorso = db ? scegliFile(nomi, c[1] + '.jpeg') : null;
+    mostraFoto(box, percorso, ESTENSIONI.map(function (e) { return 'foto/' + c[1] + '.' + e; }), 'Elettra, ' + c[1]);
+  });
+}
+
 // Sticker dei profumi: nella cartella "Profumi" di photos cerca il file che contiene "left" e quello
 // che contiene "right" nel nome (es. profumi_left.png), con qualsiasi estensione; poi i file locali.
 function scegliSticker(nomi, lato) {
@@ -754,6 +816,7 @@ async function caricaSticker() {
 caricaDestinazioni();
 caricaCopertina();
 caricaFotoLettera();
+caricaPrimaDopo();
 caricaSticker();
 
 // ---------- Modalità controllo: apri il sito con ?debug in fondo all'indirizzo ----------

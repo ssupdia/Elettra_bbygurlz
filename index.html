@@ -3,14 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#2a0d3b">
 <title>Elettra 18.0 · Birthday</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Serif:ital@0;1&family=Pinyon+Script&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=13">
+<link rel="stylesheet" href="style.css?v=15">
+<script>try{if(sessionStorage.getItem('elettra-in')==='1'||/[?&]nogate\b/.test(location.search))document.documentElement.classList.add('gate-ok')}catch(e){}</script>
+<noscript><style>.gate{display:none!important}html{overflow:auto!important}</style></noscript>
 </head>
 <body>
+<!-- INGRESSO: scrive "Elettra" come nome utente, poi coriandoli -->
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <svg class="lily l-tl bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <svg class="lily l-br spin" aria-hidden="true"><use href="#lily"/></svg>
+  <form class="gate-card" id="gateForm" autocomplete="off" novalidate>
+    <p class="gate-eyebrow">Accesso riservato</p>
+    <p class="gate-title" id="gateTitle">Elettra <em>18.0</em></p>
+    <p class="gate-sub">Scrivi il tuo nome utente per aprire il tuo regalo.</p>
+    <label class="gate-field" for="gateUser">
+      <span aria-hidden="true">utente&gt;</span>
+      <input id="gateUser" name="utente" type="text" aria-label="Nome utente" aria-describedby="gateErr" placeholder="scrivi qui" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" required>
+    </label>
+    <button class="btn magenta" type="submit">Entra</button>
+    <p class="gate-err" id="gateErr" role="alert"></p>
+  </form>
+</div>
 
 <!-- Giglio rosa (disegno riutilizzato in tutto il sito) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -107,7 +125,7 @@
   <svg class="lily l-bl" aria-hidden="true"><use href="#lily"/></svg>
   <svg class="lily l-tr" aria-hidden="true"><use href="#lily"/></svg>
   <div class="wrap">
-    <h2>Scheda Elettrica</h2>
+    <h2>Scheda elettrica</h2>
     <p class="lead">Tutto quello che c’è da sapere su Elettra, in una scheda.</p>
     <div class="spec">
       <div><h3>Fiore</h3><p>Giglio classico rosa</p></div>
@@ -169,7 +187,7 @@
       <div class="scent">
         <article>
           <figure class="sticker s-left" data-sticker="left"></figure>
-          <h4>Dolce, ma non troppo</h4><p>Una nota golosa che non stanca mai.</p>
+          <h4>Dolce, ma non troppo</h4><p>Una nota golosa che non stucca mai.</p>
         </article>
         <article><h4>Dark vibes</h4><p>Un fondo scuro, per chi sa che il bello sta anche nelle ombre.</p></article>
         <article>
@@ -265,8 +283,8 @@
     <p class="lead">Se Elettra fosse un pony, sarebbe due pony insieme.</p>
     <!-- Foto di sfondo: cartella "Pony", file twilight.jpeg e pinkie.jpeg -->
     <div class="modes">
-      <div class="mode t" data-bgfolder="Pony" data-bgname="twilight" data-bgnum="1" data-velo="leggero"><div class="vetro"><h3>Modalità Twilight</h3><p>Modalitá Twilight perché Elettra si é sempre sentita un po' sola siccome doveva imparare a stare con gli altri. Ora peró si puó dire che Elettra abbia piú che imparato.</p></div></div>
-      <div class="mode p" data-bgfolder="Pony" data-bgname="pinkie" data-bgnum="2" data-velo="leggero"><div class="vetro"><h3>Modalità Pinkie Pie</h3><p>Modalità Pinkie Pie perché ha sempre provato a piacere agli altri con una personalità non sua, ma da quando ha trovato il suo gruppo di autistici non ne ha più bisogno. Ormai Elettra è sempre se stessa ed è perfetta.</p></div></div>
+      <div class="mode t" data-bgfolder="Pony" data-bgname="twilight" data-bgnum="1" data-velo="leggero"><div class="vetro"><h3>Modalità Twilight</h3><p>Perché Elettra si è sempre sentita un po’ sola siccome doveva imparare a stare con gli altri. Ora però si può dire che Elettra abbia più che imparato.</p></div></div>
+      <div class="mode p" data-bgfolder="Pony" data-bgname="pinkie" data-bgnum="2" data-velo="leggero"><div class="vetro"><h3>Modalità Pinkie Pie</h3><p>Perché ha sempre provato a piacere agli altri con una personalità non sua, ma da quando ha trovato il suo gruppo di autistici non ne ha più bisogno. Ormai Elettra è sempre se stessa ed è perfetta.</p></div></div>
     </div>
     <div class="princesses">
       <h3>Principesse preferite</h3>
@@ -292,6 +310,9 @@
         <p>Qui comparirà la tua lettera.</p>
         <p class="sign">Con affetto</p>
       </article>
+      <div class="ba-fine" id="baFine" hidden>
+        <button type="button" class="ba-replay" id="baReplay">✨ Guarda il prima e dopo</button>
+      </div>
     </div>
     </div>
   </div>
@@ -321,8 +342,150 @@
   <video controls playsinline hidden></video>
 </div>
 
+<div class="ba" id="ba" role="dialog" aria-modal="true" aria-label="Prima e dopo">
+  <button type="button" class="ba-x" id="baClose" aria-label="Chiudi e torna al sito">×</button>
+  <svg class="lily l-tl bloom" aria-hidden="true"><use href="#lily"/></svg>
+  <svg class="lily l-br spin" aria-hidden="true"><use href="#lily"/></svg>
+  <div class="ba-stage">
+    <p class="ba-kicker">Un’ultima cosa</p>
+    <div class="ba-row">
+      <figure class="ba-card ba-prima" id="baPrima">
+        <div class="ba-img"><span>Foto</span></div>
+        <figcaption>Prima<small>quando eri un po’ più piccolina</small></figcaption>
+      </figure>
+      <svg class="ba-arrow" viewBox="0 0 56 24" aria-hidden="true"><path d="M2 12H50M40 3L51 12L40 21" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <figure class="ba-card ba-dopo" id="baDopo">
+        <div class="ba-img"><span>Foto</span></div>
+        <figcaption>Dopo<small>oggi</small></figcaption>
+      </figure>
+    </div>
+    <p class="ba-end">Elettra <em>18.0</em></p>
+    <p class="ba-hint">Premi la ✕ in alto per tornare al sito</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  var gate = document.getElementById('gate');
+  var html = document.documentElement;
+  if (!gate) return;
+  if (html.classList.contains('gate-ok')) { gate.parentNode.removeChild(gate); return; }
+  var form = document.getElementById('gateForm');
+  var input = document.getElementById('gateUser');
+  var err = document.getElementById('gateErr');
+  var fatto = false;
+  var sito = document.querySelectorAll('body > nav, body > header, body > section, body > footer');
+  sito.forEach(function (el) { el.inert = true; });
+  try { input.focus(); } catch (e) {}
+
+  function normalizza(s) {
+    s = String(s || '');
+    try { s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) {}
+    return s.toLowerCase().replace(/[^a-z]/g, '');
+  }
+
+  function coriandoli() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var c = document.createElement('canvas');
+    c.id = 'coriandoli';
+    c.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(c);
+    var ctx = c.getContext('2d');
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = 0, H = 0;
+    function misura() {
+      W = window.innerWidth; H = window.innerHeight;
+      c.width = W * dpr; c.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    misura();
+    window.addEventListener('resize', misura);
+    var colori = ['#f19ac0', '#c8207e', '#7a3fa8', '#fbe3ee', '#ffd1e6', '#ffffff', '#7d1a3a', '#e85aa0'];
+    var p = [];
+    var forza = Math.max(0.7, Math.min(1.25, H / 800));
+    function raffica(x, y, n, angolo, apertura, vel) {
+      for (var i = 0; i < n; i++) {
+        var a = angolo + (Math.random() - 0.5) * apertura;
+        var v = vel * forza * (0.55 + Math.random() * 0.65);
+        p.push({ x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+                 w: 6 + Math.random() * 8, h: 3 + Math.random() * 5,
+                 r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.4,
+                 c: colori[(Math.random() * colori.length) | 0], tondo: Math.random() < 0.25 });
+      }
+    }
+    function pioggia(n) {
+      for (var i = 0; i < n; i++) {
+        p.push({ x: Math.random() * W, y: -20 - Math.random() * H * 0.4,
+                 vx: (Math.random() - 0.5) * 2, vy: 1 + Math.random() * 3,
+                 w: 6 + Math.random() * 8, h: 3 + Math.random() * 5,
+                 r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.3,
+                 c: colori[(Math.random() * colori.length) | 0], tondo: Math.random() < 0.25 });
+      }
+    }
+    raffica(0, H, 110, -Math.PI / 3, 0.9, 23);
+    raffica(W, H, 110, -2 * Math.PI / 3, 0.9, 23);
+    setTimeout(function () { raffica(W / 2, H, 90, -Math.PI / 2, 0.8, 25); }, 350);
+    setTimeout(function () { pioggia(140); }, 800);
+    var inizio = performance.now(), ultimo = inizio;
+    function passo(t) {
+      var dt = Math.min(2.5, (t - ultimo) / 16.67); ultimo = t;
+      ctx.clearRect(0, 0, W, H);
+      var vive = 0;
+      for (var i = 0; i < p.length; i++) {
+        var q = p[i];
+        q.vy += 0.32 * dt; q.vx *= Math.pow(0.992, dt); q.vy *= Math.pow(0.994, dt);
+        q.x += q.vx * dt; q.y += q.vy * dt; q.r += q.vr * dt;
+        if (q.y > H + 30) continue;
+        vive++;
+        ctx.save();
+        ctx.translate(q.x, q.y); ctx.rotate(q.r);
+        ctx.fillStyle = q.c;
+        if (q.tondo) { ctx.beginPath(); ctx.arc(0, 0, q.h * 0.8, 0, 6.28); ctx.fill(); }
+        else ctx.fillRect(-q.w / 2, -q.h / 2, q.w, q.h);
+        ctx.restore();
+      }
+      if (vive > 0 && t - inizio < 9000) requestAnimationFrame(passo);
+      else { window.removeEventListener('resize', misura); if (c.parentNode) c.parentNode.removeChild(c); }
+    }
+    requestAnimationFrame(passo);
+  }
+
+  function entra() {
+    if (fatto) return;
+    fatto = true;
+    try { sessionStorage.setItem('elettra-in', '1'); } catch (e) {}
+    input.disabled = true;
+    err.className = 'gate-err ok';
+    err.textContent = 'Accesso consentito. Benvenuta 🤍';
+    gate.classList.add('riuscito');
+    coriandoli();
+    setTimeout(function () { gate.classList.add('esce'); }, 1000);
+    setTimeout(function () {
+      html.classList.add('gate-ok');
+      sito.forEach(function (el) { el.inert = false; });
+      if (gate.parentNode) gate.parentNode.removeChild(gate);
+      window.scrollTo(0, 0);
+    }, 1800);
+  }
+
+  function sbaglia() {
+    err.className = 'gate-err';
+    err.textContent = 'Utente non riconosciuto: questo regalo è per un’altra persona. Riprova 🤍';
+    form.classList.remove('shake');
+    void form.offsetWidth;
+    form.classList.add('shake');
+    input.select();
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (normalizza(input.value) === 'elettra') entra(); else sbaglia();
+  });
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js?v=11"></script>
-<script src="main.js?v=12"></script>
+<script src="main.js?v=14"></script>
 </body>
 </html>
