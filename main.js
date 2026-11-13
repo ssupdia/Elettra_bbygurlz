@@ -379,7 +379,7 @@ document.querySelectorAll('[data-bgfolder]').forEach(applicaSfondo);
 // Se lei la spegne col pulsante ♪, resta spenta.
 const bgm = document.getElementById('bgm');
 const bgmBtn = document.getElementById('bgmBtn');
-const BGM_VOL = 0.35;
+const BGM_VOL = 0.10;
 let bgmVoluto = true;     // false se Elettra la spegne col pulsante
 let bgmSospeso = false;   // true mentre suona un brano della sezione Musica
 let bgmErrore = false;    // file mancante o non leggibile
