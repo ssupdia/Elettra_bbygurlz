@@ -109,12 +109,17 @@ document.addEventListener('click', function (e) {
   box.classList.add('on');
 });
 function chiudiBox() {
+  const eraVideo = !boxVideo.hidden && !!boxVideo.getAttribute('src');
   box.classList.remove('on');
   boxImg.removeAttribute('src');
   boxVideo.pause();
   boxVideo.removeAttribute('src');
   boxVideo.load();
+  if (eraVideo) bgmRiprendi();
 }
+// il sottofondo si ferma mentre guarda un video e riprende alla chiusura o a fine video
+boxVideo.addEventListener('play', function () { bgmSospendi(); });
+boxVideo.addEventListener('ended', function () { bgmRiprendi(); });
 document.getElementById('closeBox').addEventListener('click', chiudiBox);
 box.addEventListener('click', function (e) { if (e.target === box) chiudiBox(); });
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape') chiudiBox(); });
@@ -367,6 +372,70 @@ async function applicaSfondo(el) {
 document.querySelectorAll('[data-bgfolder]').forEach(applicaSfondo);
 
 // ---------- Musica ----------
+// ---------- Canzone di sottofondo ----------
+// File: audio/sottofondo.mp3. Parte all'ingresso (il tocco su "Entra" sblocca l'audio),
+// si ferma mentre Elettra ascolta un brano nella sezione Musica e riprende alla chiusura.
+// Se lei la spegne col pulsante ♪, resta spenta.
+const bgm = document.getElementById('bgm');
+const bgmBtn = document.getElementById('bgmBtn');
+const BGM_VOL = 0.35;
+let bgmVoluto = true;     // false se Elettra la spegne col pulsante
+let bgmSospeso = false;   // true mentre suona un brano della sezione Musica
+let bgmErrore = false;    // file mancante o non leggibile
+let bgmFade = null;
+let bgmAttesa = false;
+
+function bgmSfuma(verso, ms, dopo) {
+  clearInterval(bgmFade);
+  const passi = Math.max(1, Math.round(ms / 40));
+  const da = bgm.volume;
+  let n = 0;
+  bgmFade = setInterval(function () {
+    n++;
+    bgm.volume = n >= passi ? verso : Math.min(1, Math.max(0, da + (verso - da) * n / passi));
+    if (n >= passi) { clearInterval(bgmFade); if (dopo) dopo(); }
+  }, 40);
+}
+function bgmSuona() {
+  if (!bgm || bgmErrore || !bgmVoluto || bgmSospeso) return;
+  if (bgm.paused) bgm.volume = 0;
+  const p = bgm.play();
+  if (p && p.catch) p.catch(function () { bgmInAttesaTocco(); });
+  bgmSfuma(BGM_VOL, 1500);
+}
+function bgmFerma() {
+  if (!bgm || bgm.paused) return;
+  bgmSfuma(0, 400, function () { bgm.pause(); });
+}
+function bgmSospendi() { bgmSospeso = true; bgmFerma(); }
+function bgmRiprendi() { bgmSospeso = false; bgmSuona(); }
+
+// Se il browser blocca la partenza automatica (es. pagina ricaricata), parte al primo tocco
+function bgmInAttesaTocco() {
+  if (bgmAttesa) return;
+  bgmAttesa = true;
+  const sblocca = function (e) {
+    if (e.target.closest && e.target.closest('#bgmBtn')) return;
+    ['pointerdown', 'keydown'].forEach(function (t) { document.removeEventListener(t, sblocca, true); });
+    bgmAttesa = false;
+    bgmSuona();
+  };
+  ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, sblocca, true); });
+}
+
+if (bgm && bgmBtn) {
+  bgm.addEventListener('play', function () { bgmBtn.classList.remove('off'); bgmBtn.setAttribute('aria-pressed', 'true'); bgmBtn.setAttribute('aria-label', 'Metti in pausa la musica di sottofondo'); });
+  bgm.addEventListener('pause', function () { bgmBtn.classList.add('off'); bgmBtn.setAttribute('aria-pressed', 'false'); bgmBtn.setAttribute('aria-label', 'Riattiva la musica di sottofondo'); });
+  bgm.addEventListener('error', function () { bgmErrore = true; bgmBtn.hidden = true; });
+  bgmBtn.addEventListener('click', function () {
+    if (bgm.paused) { bgmVoluto = true; bgmSuona(); }
+    else { bgmVoluto = false; bgmFerma(); }
+  });
+  window.bgmAvvia = bgmSuona;
+  // pagina ricaricata dopo l'ingresso: prova a partire (o aspetta il primo tocco)
+  if (document.documentElement.classList.contains('gate-ok')) bgmSuona();
+}
+
 // Brani dalla tabella "music" di Supabase (copertina in photos/musica, audio nel bucket "audio").
 // Senza Supabase: foto/musica/1.jpg ... e audio/1.mp3 ... in locale.
 const player = document.getElementById('player');
@@ -382,6 +451,7 @@ let audioRiprovato = false;
 
 function apriPlayer(b, coverUrl) {
   correnteB = b;
+  bgmSospendi();
   audioRiprovato = false;
   player.classList.remove('in-pausa');
   const cover = coverUrl || b.cover;
@@ -402,10 +472,12 @@ function apriPlayer(b, coverUrl) {
   player.classList.add('on');
 }
 function chiudiPlayer() {
+  const eraAperto = player.classList.contains('on');
   pAudio.pause();
   pAudio.removeAttribute('src');
   pAudio.load();
   player.classList.remove('on');
+  if (eraAperto) bgmRiprendi();
 }
 pAudio.addEventListener('error', async function () {
   if (!pAudio.getAttribute('src')) return;
@@ -911,7 +983,8 @@ document.querySelectorAll('img[data-percorso]').forEach(function (img) {
 });
 
 // ---------- Player: il vinile si ferma quando la musica è in pausa ----------
-pAudio.addEventListener('play', function () { player.classList.remove('in-pausa'); });
+pAudio.addEventListener('play', function () { player.classList.remove('in-pausa'); bgmSospendi(); });
+pAudio.addEventListener('ended', function () { bgmRiprendi(); });
 pAudio.addEventListener('pause', function () { player.classList.add('in-pausa'); });
 
 // ---------- Comparsa morbida delle sezioni allo scorrimento ----------

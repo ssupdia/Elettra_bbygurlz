@@ -8,7 +8,7 @@
 <title>Elettra 18.0 · Birthday</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Serif:ital@0;1&family=Pinyon+Script&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=16">
 <script>try{if(sessionStorage.getItem('elettra-in')==='1'||/[?&]nogate\b/.test(location.search))document.documentElement.classList.add('gate-ok')}catch(e){}</script>
 <noscript><style>.gate{display:none!important}html{overflow:auto!important}</style></noscript>
 </head>
@@ -336,6 +336,10 @@
   </div>
 </div>
 
+<!-- Canzone di sottofondo: metti il file in audio/sottofondo.mp3 -->
+<audio id="bgm" src="audio/sottofondo.mp3" loop preload="auto"></audio>
+<button type="button" class="bgm-btn off" id="bgmBtn" aria-pressed="false" aria-label="Riattiva la musica di sottofondo">♪</button>
+
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Foto ingrandita">
   <button type="button" id="closeBox" aria-label="Chiudi">×</button>
   <img alt="">
@@ -453,6 +457,7 @@
   function entra() {
     if (fatto) return;
     fatto = true;
+    try { if (window.bgmAvvia) window.bgmAvvia(); } catch (e) {}
     try { sessionStorage.setItem('elettra-in', '1'); } catch (e) {}
     input.disabled = true;
     err.className = 'gate-err ok';
@@ -486,6 +491,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js?v=11"></script>
-<script src="main.js?v=14"></script>
+<script src="main.js?v=16"></script>
 </body>
 </html>
