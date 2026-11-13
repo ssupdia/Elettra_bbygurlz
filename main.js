@@ -379,7 +379,10 @@ document.querySelectorAll('[data-bgfolder]').forEach(applicaSfondo);
 // Se lei la spegne col pulsante ♪, resta spenta.
 const bgm = document.getElementById('bgm');
 const bgmBtn = document.getElementById('bgmBtn');
-const BGM_VOL = 0.10;
+const bgmBox = document.getElementById('bgmBox');
+const bgmSlider = document.getElementById('bgmVol');
+let bgmLivello = 0.35;    // volume iniziale (0 muto, 1 massimo); poi lo regola lo slider
+try { const s = parseFloat(sessionStorage.getItem('elettra-bgm-vol')); if (s >= 0 && s <= 1) bgmLivello = s; } catch (e) {}
 let bgmVoluto = true;     // false se Elettra la spegne col pulsante
 let bgmSospeso = false;   // true mentre suona un brano della sezione Musica
 let bgmErrore = false;    // file mancante o non leggibile
@@ -430,7 +433,7 @@ function bgmSuona() {
   if (bgm.paused) bgm.volume = 0;
   const p = bgm.play();
   if (p && p.catch) p.catch(function () { bgmInAttesaTocco(); });
-  bgmSfuma(BGM_VOL, 1500);
+  bgmSfuma(bgmLivello, 1500);
 }
 function bgmFerma() {
   if (!bgm || bgm.paused) return;
@@ -458,13 +461,24 @@ if (bgm && bgmBtn) {
   bgm.addEventListener('error', function () {
     if (!bgm.getAttribute('src')) return;
     bgmProssimaFonte().then(function (ok) {
-      if (ok) bgmSuona(); else { bgmErrore = true; bgmBtn.hidden = true; }
+      if (ok) bgmSuona(); else { bgmErrore = true; bgmBox.hidden = true; }
     });
   });
   bgmBtn.addEventListener('click', function () {
     if (bgm.paused) { bgmVoluto = true; bgmSuona(); }
     else { bgmVoluto = false; bgmFerma(); }
   });
+  // slider del volume (su iPhone/iPad il volume del browser è fisso: lì lo slider si nasconde)
+  if (bgmSlider) {
+    bgmSlider.value = Math.round(bgmLivello * 100);
+    try { bgm.volume = 0.5; if (Math.abs(bgm.volume - 0.5) > 0.01) bgmSlider.hidden = true; bgm.volume = 0; } catch (e) { bgmSlider.hidden = true; }
+    bgmSlider.addEventListener('input', function () {
+      bgmLivello = bgmSlider.value / 100;
+      try { sessionStorage.setItem('elettra-bgm-vol', String(bgmLivello)); } catch (e) {}
+      if (bgm.paused) { if (bgmLivello > 0 && !bgmSospeso) { bgmVoluto = true; bgmSuona(); } }
+      else if (!bgmSospeso) { clearInterval(bgmFade); bgm.volume = bgmLivello; }
+    });
+  }
   window.bgmAvvia = function () { bgmAvviato = true; bgmSuona(); };
   // la sorgente si prepara subito, così al clic su "Entra" è già pronta
   bgmPronta = bgmCercaFile().then(bgmProssimaFonte);

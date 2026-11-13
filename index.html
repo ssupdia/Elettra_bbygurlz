@@ -8,7 +8,7 @@
 <title>Elettra 18.0 · Birthday</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Serif:ital@0;1&family=Pinyon+Script&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=17">
 <script>try{if(sessionStorage.getItem('elettra-in')==='1'||/[?&]nogate\b/.test(location.search))document.documentElement.classList.add('gate-ok')}catch(e){}</script>
 <noscript><style>.gate{display:none!important}html{overflow:auto!important}</style></noscript>
 </head>
@@ -338,7 +338,10 @@
 
 <!-- Canzone di sottofondo: carica "sottofondo.mp3" nel bucket "audio" di Supabase (la sorgente la imposta main.js) -->
 <audio id="bgm" loop preload="auto"></audio>
-<button type="button" class="bgm-btn off" id="bgmBtn" aria-pressed="false" aria-label="Riattiva la musica di sottofondo">♪</button>
+<div class="bgm-box" id="bgmBox">
+  <button type="button" class="bgm-btn off" id="bgmBtn" aria-pressed="false" aria-label="Riattiva la musica di sottofondo">♪</button>
+  <input type="range" class="bgm-vol" id="bgmVol" min="0" max="100" step="1" value="35" aria-label="Volume della musica di sottofondo">
+</div>
 
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Foto ingrandita">
   <button type="button" id="closeBox" aria-label="Chiudi">×</button>
@@ -355,12 +358,12 @@
     <div class="ba-row">
       <figure class="ba-card ba-prima" id="baPrima">
         <div class="ba-img"><span>Foto</span></div>
-        <figcaption>Prima<small>Quando eri un po’ più piccolina carina carina</small></figcaption>
+        <figcaption>Prima<small>quando eri un po’ più piccolina</small></figcaption>
       </figure>
       <svg class="ba-arrow" viewBox="0 0 56 24" aria-hidden="true"><path d="M2 12H50M40 3L51 12L40 21" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <figure class="ba-card ba-dopo" id="baDopo">
         <div class="ba-img"><span>Foto</span></div>
-        <figcaption>Dopo<small>Ad oggi che sei una bellissima giovane Donna</small></figcaption>
+        <figcaption>Dopo<small>oggi</small></figcaption>
       </figure>
     </div>
     <p class="ba-end">Elettra <em>18.0</em></p>
@@ -491,6 +494,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js?v=11"></script>
-<script src="main.js?v=17"></script>
+<script src="main.js?v=18"></script>
 </body>
 </html>
