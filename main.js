@@ -373,7 +373,8 @@ document.querySelectorAll('[data-bgfolder]').forEach(applicaSfondo);
 
 // ---------- Musica ----------
 // ---------- Canzone di sottofondo ----------
-// File: audio/sottofondo.mp3. Parte all'ingresso (il tocco su "Entra" sblocca l'audio),
+// File: nel bucket "audio" di Supabase, chiamato sottofondo.mp3 (oppure in locale: audio/sottofondo.mp3).
+// Parte all'ingresso (il tocco su "Entra" sblocca l'audio),
 // si ferma mentre Elettra ascolta un brano nella sezione Musica e riprende alla chiusura.
 // Se lei la spegne col pulsante ♪, resta spenta.
 const bgm = document.getElementById('bgm');
@@ -384,6 +385,33 @@ let bgmSospeso = false;   // true mentre suona un brano della sezione Musica
 let bgmErrore = false;    // file mancante o non leggibile
 let bgmFade = null;
 let bgmAttesa = false;
+let bgmAvviato = false;   // diventa true solo dopo l'ingresso (mai musica davanti al login)
+let bgmNome = null;       // nome del file trovato nel bucket "audio"
+let bgmTentativo = 0;
+let bgmPronta = Promise.resolve();
+
+// Cerca sottofondo.* nel bucket "audio" di Supabase
+async function bgmCercaFile() {
+  if (!db) return;
+  try {
+    const r = await db.storage.from('audio').list('', { limit: 100 });
+    if (r.error || !r.data) return;
+    const f = r.data.find(function (x) { return /^sottofondo\.(mp3|m4a|aac|ogg|wav|webm)$/i.test(x.name); });
+    if (f) bgmNome = f.name;
+  } catch (e) { /* si userà il file locale */ }
+}
+// Sorgenti provate in ordine: link pubblico, link temporaneo (bucket privato), file locale
+async function bgmProssimaFonte() {
+  while (bgmTentativo < 3) {
+    const t = bgmTentativo++;
+    let url = null;
+    if (t === 0 && bgmNome) url = db.storage.from('audio').getPublicUrl(bgmNome).data.publicUrl;
+    else if (t === 1 && bgmNome) url = await urlFirmato('audio', bgmNome);
+    else if (t === 2) url = 'audio/sottofondo.mp3';
+    if (url) { bgm.src = url; return true; }
+  }
+  return false;
+}
 
 function bgmSfuma(verso, ms, dopo) {
   clearInterval(bgmFade);
@@ -397,7 +425,8 @@ function bgmSfuma(verso, ms, dopo) {
   }, 40);
 }
 function bgmSuona() {
-  if (!bgm || bgmErrore || !bgmVoluto || bgmSospeso) return;
+  if (!bgm || bgmErrore || !bgmAvviato || !bgmVoluto || bgmSospeso) return;
+  if (!bgm.getAttribute('src')) { bgmPronta.then(bgmSuona); return; }
   if (bgm.paused) bgm.volume = 0;
   const p = bgm.play();
   if (p && p.catch) p.catch(function () { bgmInAttesaTocco(); });
@@ -426,14 +455,21 @@ function bgmInAttesaTocco() {
 if (bgm && bgmBtn) {
   bgm.addEventListener('play', function () { bgmBtn.classList.remove('off'); bgmBtn.setAttribute('aria-pressed', 'true'); bgmBtn.setAttribute('aria-label', 'Metti in pausa la musica di sottofondo'); });
   bgm.addEventListener('pause', function () { bgmBtn.classList.add('off'); bgmBtn.setAttribute('aria-pressed', 'false'); bgmBtn.setAttribute('aria-label', 'Riattiva la musica di sottofondo'); });
-  bgm.addEventListener('error', function () { bgmErrore = true; bgmBtn.hidden = true; });
+  bgm.addEventListener('error', function () {
+    if (!bgm.getAttribute('src')) return;
+    bgmProssimaFonte().then(function (ok) {
+      if (ok) bgmSuona(); else { bgmErrore = true; bgmBtn.hidden = true; }
+    });
+  });
   bgmBtn.addEventListener('click', function () {
     if (bgm.paused) { bgmVoluto = true; bgmSuona(); }
     else { bgmVoluto = false; bgmFerma(); }
   });
-  window.bgmAvvia = bgmSuona;
+  window.bgmAvvia = function () { bgmAvviato = true; bgmSuona(); };
+  // la sorgente si prepara subito, così al clic su "Entra" è già pronta
+  bgmPronta = bgmCercaFile().then(bgmProssimaFonte);
   // pagina ricaricata dopo l'ingresso: prova a partire (o aspetta il primo tocco)
-  if (document.documentElement.classList.contains('gate-ok')) bgmSuona();
+  if (document.documentElement.classList.contains('gate-ok')) { bgmAvviato = true; bgmSuona(); }
 }
 
 // Brani dalla tabella "music" di Supabase (copertina in photos/musica, audio nel bucket "audio").

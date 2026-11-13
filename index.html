@@ -336,8 +336,8 @@
   </div>
 </div>
 
-<!-- Canzone di sottofondo: metti il file in audio/sottofondo.mp3 -->
-<audio id="bgm" src="audio/sottofondo.mp3" loop preload="auto"></audio>
+<!-- Canzone di sottofondo: carica "sottofondo.mp3" nel bucket "audio" di Supabase (la sorgente la imposta main.js) -->
+<audio id="bgm" loop preload="auto"></audio>
 <button type="button" class="bgm-btn off" id="bgmBtn" aria-pressed="false" aria-label="Riattiva la musica di sottofondo">♪</button>
 
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Foto ingrandita">
@@ -491,6 +491,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js?v=11"></script>
-<script src="main.js?v=16"></script>
+<script src="main.js?v=17"></script>
 </body>
 </html>
